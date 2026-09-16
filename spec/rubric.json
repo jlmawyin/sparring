@@ -1,0 +1,85 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "nombre": "Rúbrica de evaluación conductual y procedimental para Sparring",
+    "proposito": "Evaluación formativa de habilidades de comunicación y apego a políticas mediante citas verificables del usuario",
+    "reglas_calculo": {
+      "formula": "100 * sum(weight * level / 4) / sum(observed_weights)",
+      "redondeo": "Redondeo simétrico al entero más cercano (round half up)",
+      "cobertura_minima": 60,
+      "regla_cobertura": "Si coverage (suma de pesos observados) < 60, el puntaje total es null",
+      "unicidad_observacion": "Máximo una observación activa por criterio al cierre de la sesión",
+      "distincion_cero_null": "Nivel 0 indica fallo observable y penaliza; null indica falta de oportunidad/evidencia y se excluye del divisor",
+      "restricciones_eticas": "No evaluar ni puntuar acentos, género, salud mental, tono afectivo inferido ni atributos personales",
+      "validez_cientifica": "Herramienta estrictamente pedagógica y formativa; no representa diagnóstico psicológico ni certificación psicométrica formal",
+      "fuente_evidencia": "Toda evidencia debe provenir exclusivamente de turnos con role 'USER' mediante citas textuales exactas"
+    }
+  },
+  "criteria": [
+    {
+      "id": "empathy",
+      "label": "Empatía y reconocimiento del impacto",
+      "weight": 20,
+      "anchors": {
+        "0": "Invalida, ignora activamente o confronta al interlocutor ante su queja o malestar (ej. 'usted está exagerando', 'eso no es mi problema').",
+        "1": "Utiliza clichés o frases formularias vacías de forma mecánica sin escuchar el impacto particular expuesto por el cliente.",
+        "2": "Reconoce la situación del cliente de manera básica o neutral, aunque sin profundizar en el impacto práctico reportado.",
+        "3": "Valida adecuadamente la molestia y el impacto concreto expresado por el cliente, adaptando su lenguaje al contexto situacional.",
+        "4": "Resume el impacto concreto expresado, comprueba que lo entendió y ofrece colaborar con una acción pertinente."
+      },
+      "not_observable_condition": "El cliente no manifestó emociones, urgencias ni molestias que ameritaran contención (null)."
+    },
+    {
+      "id": "discovery",
+      "label": "Indagación y diagnóstico de la situación",
+      "weight": 20,
+      "anchors": {
+        "0": "Asume erróneamente la situación sin preguntar, o procede a ofrecer soluciones a ciegas sin verificar hechos básicos.",
+        "1": "Realiza preguntas cerradas superficiales que no aportan claridad sobre los antecedentes o la causa raíz del problema.",
+        "2": "Verifica los datos mínimos requeridos (ej. número de orden, montos) pero no explora el impacto ni las necesidades de fondo.",
+        "3": "Efectúa preguntas pertinentes y abiertas que permiten clarificar con precisión los antecedentes, prioridades y expectativas del cliente.",
+        "4": "Pregunta por hechos y prioridad, confirma lo entendido y usa la respuesta para elegir la solución."
+      },
+      "not_observable_condition": "La interacción no ofreció margen temporal o el contexto contenía todos los datos evidentes sin necesidad de indagación (null)."
+    },
+    {
+      "id": "objection_handling",
+      "label": "Manejo estructurado de objeciones",
+      "weight": 25,
+      "anchors": {
+        "0": "Colapsa ante la objeción, discute agresivamente o evade responder a la discrepancia planteada por el cliente.",
+        "1": "Responde de forma reactiva o defensiva, justificándose en lugar de abordar el fondo de la objeción.",
+        "2": "Reconoce la objeción y ofrece un argumento estándar, aunque insuficiente para mitigar la duda del cliente.",
+        "3": "Aísla y reformula la objeción adecuadamente, rebatiendo con argumentos de valor verificables y alternativas válidas.",
+        "4": "Transforma la objeción en una oportunidad de valor mediante reencuadre positivo, evidencia sólida y verificación explícita de conformidad del cliente."
+      },
+      "not_observable_condition": "El cliente no presentó objeciones, dudas de precio ni reparos durante la conversación (null)."
+    },
+    {
+      "id": "solution_integrity",
+      "label": "Integridad de la solución y apego a límites de autoridad",
+      "weight": 20,
+      "anchors": {
+        "0": "Viola gravemente las restricciones de autoridad (promete reembolsos no autorizados, inventa descuentos prohibidos o asegura tiempos imposibles).",
+        "1": "Ofrece soluciones confusas o ambiguas que inducen a error al cliente sobre las políticas o plazos reales de la empresa.",
+        "2": "Aplica las políticas de forma rígida y burocrática sin proponer alternativas viables de mitigación dentro de su ámbito.",
+        "3": "Propone soluciones legítimas dentro de su marco de autoridad, explicando los límites con claridad y activando escalamientos correctos si procede.",
+        "4": "Maximiza el valor de la solución dentro del marco normativo estricto, documentando compromisos exactos y protegiendo tanto al cliente como la sostenibilidad de la empresa."
+      },
+      "not_observable_condition": "La conversación no avanzó a la fase de planteamiento de soluciones o acuerdos (null)."
+    },
+    {
+      "id": "closing",
+      "label": "Cierre de acuerdos y próximos pasos",
+      "weight": 15,
+      "anchors": {
+        "0": "Abandona o corta la conversación abruptamente sin resumen, o intenta forzar un cierre prematuro sin haber atendido la consulta.",
+        "1": "Finaliza de forma ambigua dejando al cliente con dudas sobre quién hace qué o cuándo ocurrirá el siguiente contacto.",
+        "2": "Menciona un próximo paso elemental pero omite detalles operativos clave como plazos, números de ticket o canales de contacto.",
+        "3": "Sintetiza los acuerdos alcanzados, estipula plazos claros de seguimiento y verifica que no queden dudas pendientes.",
+        "4": "Resume acuerdo, responsable y plazo autorizados, pregunta por conformidad y explica cómo dar seguimiento sin inventar tickets."
+      },
+      "not_observable_condition": "La llamada fue interrumpida prematuramente por causas técnicas ajenas al usuario o antes de llegar a la fase de cierre (null)."
+    }
+  ]
+}

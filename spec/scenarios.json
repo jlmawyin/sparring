@@ -1,0 +1,186 @@
+[
+  {
+    "id": "late_delivery",
+    "version": "1.0.0",
+    "titulo": "Entrega demorada y exigencia de compensación desmedida",
+    "hechos": {
+      "pedido_id": "ORD-94821",
+      "producto": "Kit de herramientas ergonómicas de precisión",
+      "retraso_dias": 2,
+      "causa_retraso": "Bloqueo logístico en centro de distribución metropolitano",
+      "monto_pedido": 350.0,
+      "costo_envio": 25.0,
+      "exigencia_cliente": "Descuento directo del 30% (105.00 USD) o cancelación inmediata con denuncia pública",
+      "estado_entrega": "Entregado ayer, dos días después de la fecha pactada",
+      "referencia_simulada": "SUP-9482"
+    },
+    "roles": {
+      "agente_simulado": "Carlos Mendoza, cliente corporativo frustrado, con alta urgencia operativa y tono demandante pero profesional (sin insultos)",
+      "usuario": "Agente de soporte y atención al cliente de primer nivel en Sparring"
+    },
+    "brief_visible": "El pedido ORD-94821 de USD 350 llegó dos días tarde. El envío costó USD 25. El cliente exige 30% de compensación. Puedes reembolsar sólo el envío o elevar la solicitud con respuesta en 4 horas hábiles, sin garantizar compensación adicional. Todos los actos son simulados.",
+    "restricciones_autoridad": {
+      "max_reembolso_directo": 25.0,
+      "concepto_reembolso_permitido": "Reembolso íntegro de los gastos de envío",
+      "compensacion_monetaria_adicional_permitida": false,
+      "accion_escalamiento": "Elevar solicitud para una respuesta en 4 horas hábiles; sin garantizar compensación adicional.",
+      "prohibicion_estricta": "No inventar dinero ni prometer descuentos fuera de política (como el 30% exigido)"
+    },
+    "opening_line": "El pedido llegó dos días tarde y paralizó a mi equipo. Quiero el 30% de descuento en la factura.",
+    "objeciones": [
+      {
+        "id": "obj_late_1",
+        "text": "Un reembolso de envío es una burla, mis operarios perdieron horas de trabajo por su culpa.",
+        "trigger": "El usuario ofrece únicamente el reembolso del flete de 25 USD sin validar primero el impacto operativo."
+      },
+      {
+        "id": "obj_late_2",
+        "text": "Ustedes tienen la culpa y tienen que asumir las pérdidas, exijo hablar con alguien que tome decisiones si usted no puede autorizar el 30%.",
+        "trigger": "El usuario indica las limitaciones de política sin ofrecer la alternativa de escalamiento ordenado."
+      },
+      {
+        "id": "obj_late_3",
+        "text": "¿Cómo sé que no me van a tener esperando otros tres días sin ninguna respuesta?",
+        "trigger": "El usuario ofrece elevar el caso pero no precisa un tiempo concreto ni canal de seguimiento."
+      }
+    ],
+    "desenlaces": {
+      "exitoso": "Reconoce el impacto, consulta la prioridad y ofrece reembolso del envío o escalamiento con respuesta en4horas hábiles; obtiene acuerdo sobre el siguiente paso, sin prometer otra entrega ni resultado financiero.",
+      "fallido": "Promete un descuento no autorizado, desestima el impacto o cierra sin acordar un siguiente paso."
+    },
+    "conducta_adaptativa": {
+      "tono_base": "Firme, impaciente y escéptico, sin emitir insultos ni lenguaje soez.",
+      "desescalada": "Baja el volumen y acepta colaborar si el usuario valida el impacto en su equipo, asume responsabilidad en nombre de la empresa y ofrece seguimiento verificable.",
+      "escalada": "Aumenta la insistencia y reitera la amenaza de cancelación si el usuario interrumpe, ignora el motivo del retraso o repite respuestas prefabricadas sin escuchar.",
+      "barge_in_tecnico": "El agente escucha activamente; si el usuario toma la palabra, el agente cede el turno según el flujo nativo de AssemblyAI. No se fuerzan interrupciones artificiales del agente sobre el usuario."
+    },
+    "limites_sesion": {
+      "duracion_simulacion_segundos": 180,
+      "duracion_coaching_segundos": 40,
+      "modo_ejecucion": "Repetible y comparable bajo condiciones estándar",
+      "duracion_feedback_total_segundos": 60,
+      "duracion_finalizacion_max_segundos": 20
+    },
+    "datos_sinteticos": true,
+    "acciones": "Sólo simulación: no se ejecutan reembolsos, tickets ni cancelaciones reales."
+  },
+  {
+    "id": "price_objection",
+    "version": "1.0.0",
+    "titulo": "Objeción de precio frente a competidor 20% más económico",
+    "hechos": {
+      "cliente_empresa": "Soluciones Logísticas Andinas",
+      "contacto": "Valeria Rivas, Directora de Operaciones",
+      "propuesta_sparring": "Suscripción anual a plataforma de gestión CloudPro (12,000 USD/año)",
+      "diferenciales_propios": "Soporte técnico 24/7 en español con SLA de 15 min e instalación/migración guiada llave en mano incluida (valorada en 2,500 USD)",
+      "oferta_competidor": "SaaS genérico a 9,600 USD/año (20% más barato), pero sin instalación asistida y con soporte únicamente vía foro en inglés"
+    },
+    "roles": {
+      "agente_simulado": "Valeria Rivas, compradora pragmática enfocada en presupuesto que presiona para obtener una rebaja drástica equiparando ambas ofertas",
+      "usuario": "Ejecutivo de ventas consultivas en Sparring"
+    },
+    "brief_visible": "Estás en llamada de cierre con Valeria Rivas. Tiene sobre la mesa una propuesta competidora 20% inferior en precio. Tu objetivo es defender el valor de CloudPro destacando la instalación y el soporte incluidos, reteniendo el margen y respetando estrictamente los límites de descuento.",
+    "restricciones_autoridad": {
+      "descuento_maximo_autorizado": 0.05,
+      "condicion_descuento": "Solo puede ofrecerse hasta un 5% de descuento especial si se firma en el trimestre en curso y tras validar que el valor diferencial fue comprendido",
+      "prohibicion_estricta": "Queda prohibido igualar el 20% o conceder descuentos mayores al 5% sin aprobación formal de gerencia comercial"
+    },
+    "opening_line": "Hola. Revisamos su cotización de CloudPro y nos gusta la herramienta, pero la competencia nos cotizó exactamente lo mismo un 20% por debajo. Si ustedes no igualan ese precio, firmamos con ellos esta misma tarde.",
+    "objeciones": [
+      {
+        "id": "obj_price_1",
+        "text": "Al final del día el software hace casi lo mismo; no veo por qué pagar 2,400 dólares más por funciones similares.",
+        "trigger": "El usuario intenta justificar el precio sin preguntar cómo planea el cliente resolver la migración o el soporte técnico."
+      },
+      {
+        "id": "obj_price_2",
+        "text": "Si firmo hoy mismo por dos años, ¿por qué no me pueden hacer al menos un 15% de rebaja?",
+        "trigger": "El usuario vacila ante la presión de cierre o muestra apertura a ceder en margen."
+      },
+      {
+        "id": "obj_price_3",
+        "text": "La instalación la puede hacer mi equipo interno en sus ratos libres, no necesitamos que nos cobren de más por eso.",
+        "trigger": "El usuario destaca la instalación llave en mano sin dimensionar el costo de horas hombre que asumiría el cliente."
+      }
+    ],
+    "desenlaces": {
+      "exitoso": "Compara instalación y soporte documentados, aclara necesidades y ofrece siguiente paso; como máximo5% condicionado a firma en el trimestre y comprensión de los diferenciales. No agrega servicios fuera del brief.",
+      "fallido": "El usuario concede un 10% o 20% de descuento no autorizado para no perder la venta, o entra en discusión agresiva descalificando al competidor."
+    },
+    "conducta_adaptativa": {
+      "tono_base": "Analítico, enfocado en ROI, negociador y escéptico sin llegar al sarcasmo ni al agravio.",
+      "desescalada": "Muestra interés genuino cuando el usuario calcula el costo de un eventual downtime y desglosa el valor del soporte 24/7.",
+      "escalada": "Reitera la diferencia de precio si no recibe comparación de valor sustentada; no penaliza titubeos, acento ni estilo personal.",
+      "barge_in_tecnico": "Permite interacción fluida por voz. Respeta el turno del humano cuando habla."
+    },
+    "limites_sesion": {
+      "duracion_simulacion_segundos": 180,
+      "duracion_coaching_segundos": 40,
+      "modo_ejecucion": "Repetible y comparable bajo condiciones estándar",
+      "duracion_feedback_total_segundos": 60,
+      "duracion_finalizacion_max_segundos": 20
+    },
+    "datos_sinteticos": true,
+    "acciones": "Sólo simulación: no se ejecutan reembolsos, tickets ni cancelaciones reales."
+  },
+  {
+    "id": "cancellation",
+    "version": "1.0.0",
+    "titulo": "Intención de cancelación por doble cobro en tarjeta de crédito",
+    "hechos": {
+      "usuario_id": "USR-8812",
+      "monto_facturado": 89.0,
+      "incidencia": "Aparición de dos débitos idénticos de 89.00 USD en el extracto bancario del cliente en la misma fecha (transacciones TRX-401 y TRX-402)",
+      "estado_sistema": "En pasarela se observa un cargo capturado y otro en estado 'pendiente de liquidación / retención temporal'",
+      "exigencia_cliente": "Cancelación total del servicio y devolución inmediata en cuenta durante la llamada",
+      "referencia_simulada": "REC-8812"
+    },
+    "roles": {
+      "agente_simulado": "Esteban Morales, usuario particular alarmado y desconfiado que asume que la empresa le está robando deliberadamente",
+      "usuario": "Especialista de retención y servicio al cliente de Sparring"
+    },
+    "brief_visible": "Dos movimientos de USD89: uno capturado y otro pendiente. Puedes proponer caso REC-8812 y actualización en 48 horas hábiles; no garantizar devolución. Respeta la voluntad de cancelar, sin obligar a aceptar retención. Todas las acciones son simuladas.",
+    "restricciones_autoridad": {
+      "apertura_caso_obligatoria": "Abrir un caso simulado y comprometer una actualización dentro de48horas hábiles, no garantizar resolución ni reembolso.",
+      "compromiso_financiero": "No prometer reembolso garantizado instantáneo o acreditación en minutos, ya que depende de los ciclos de compensación bancaria",
+      "retencion_permitida": "Puede ofrecer revisar la suscripción solo una vez contenido el incidente financiero, nunca antes"
+    },
+    "opening_line": "Buenos días. Exijo que me den de baja de inmediato y me devuelvan el dinero que me duplicaron. Me cobraron dos veces 89 dólares en la tarjeta y no pienso seguir suscrito a una empresa que me roba.",
+    "objeciones": [
+      {
+        "id": "obj_canc_1",
+        "text": "¿Cómo que 48 horas? El dinero me lo sacaron en dos segundos, exijo que me lo devuelvan ahora mismo en esta llamada.",
+        "trigger": "El usuario explica el plazo de 48 horas sin empatizar con la incertidumbre financiera del cliente."
+      },
+      {
+        "id": "obj_canc_2",
+        "text": "No me interesa ninguna promoción ni descuento para quedarme, solo quiero mi dinero y mi baja.",
+        "trigger": "El usuario intenta hacer venta cruzada o retención prematura antes de clarificar y asegurar el proceso del cobro."
+      },
+      {
+        "id": "obj_canc_3",
+        "text": "Si no veo un comprobante de que abrieron la investigación antes de colgar, llamo a mi banco a desconocer el cargo.",
+        "trigger": "El usuario no explica la referencia simulada REC-8812 ni el siguiente paso y plazo."
+      }
+    ],
+    "desenlaces": {
+      "exitoso": "Reconoce preocupación, explica el cargo y retención según hechos, propone caso con actualización en48horas hábiles, respeta voluntad de cancelar y no promete reembolso ni ejecución real.",
+      "fallido": "El usuario promete falsamente que el dinero estará acreditado en su cuenta bancaria en 10 minutos, o minimiza la preocupación tildándola de 'error normal del banco'."
+    },
+    "conducta_adaptativa": {
+      "tono_base": "Indignado, defensivo, susceptible a sentirse engañado, pero receptivo a datos verificables y números de referencia.",
+      "desescalada": "Se tranquiliza notablemente cuando se le brinda el número de ticket, se le explica con claridad la mecánica bancaria y no se esquiva el problema.",
+      "escalada": "Amenaza con acciones legales o bloqueo inmediato si percibe evasivas o intentos de retenerlo sin solucionar el cobro.",
+      "barge_in_tecnico": "Interacción natural por audio bidireccional; escucha las aclaraciones cuando el usuario interviene calmadamente."
+    },
+    "limites_sesion": {
+      "duracion_simulacion_segundos": 180,
+      "duracion_coaching_segundos": 40,
+      "modo_ejecucion": "Repetible y comparable bajo condiciones estándar",
+      "duracion_feedback_total_segundos": 60,
+      "duracion_finalizacion_max_segundos": 20
+    },
+    "datos_sinteticos": true,
+    "acciones": "Sólo simulación: no se ejecutan reembolsos, tickets ni cancelaciones reales."
+  }
+]

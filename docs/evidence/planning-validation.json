@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "scope": "Specification consistency only; no application, API, audio or semantic model tests",
+  "scenarios": 3,
+  "criteria": 5,
+  "tools": 2,
+  "fixtures": 10,
+  "documents": 12,
+  "localLinks": 8,
+  "checked": [
+    "JSON parsing",
+    "IDs/weights/anchors",
+    "session time budget",
+    "tool envelope",
+    "fixture evidence/roles",
+    "fixture expected arithmetic",
+    "document links",
+    "prompt placeholders"
+  ],
+  "productTests": "NOT_RUN"
+}

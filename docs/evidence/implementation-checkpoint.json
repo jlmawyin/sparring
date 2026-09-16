@@ -1,0 +1,17 @@
+{
+  "recorded_at": "2026-09-16T16:33:00Z",
+  "scope": "Local integration checkpoint after Grok 4.6 handoff; AssemblyAI mocked in automated tests; live call not run",
+  "typecheck": {"command": "npm run typecheck", "exit_code": 0},
+  "unit": {"command": "npm test", "passed": 118, "failed": 0, "exit_code": 0, "files": 7, "includes_server_app_tests": true, "includes_evaluate_recovery": true},
+  "build": {"command": "npm run build", "exit_code": 0, "bundle": "dist/assets/index-BAoVxe85.js", "bundle_bytes": 251010, "secret_markers_in_dist": false},
+  "e2e": {"command": "npm run test:e2e", "passed": 7, "failed": 0, "exit_code": 0, "duration_seconds": 15.3, "includes_real_local_http_server": true, "provider": "MOCK"},
+  "quota_env": {"honored": true, "session_seconds_bounds": [60, 240], "daily_minutes_bounds": [1, 30], "applied_to": ["reservation", "deadline", "max_seconds", "token_max_session_duration_seconds"]},
+  "evaluate_timeout_recovery": {"implemented": true, "identical_retry": true, "revision_conflict_replay": true, "invents_success": false, "tests": "tests/voice/evaluateRecovery.test.ts"},
+  "dev": {"command": "npm run dev", "web": "http://127.0.0.1:5173", "api": "http://127.0.0.1:8787", "health": {"status": "ok", "key_configured": true, "voice_enabled": true, "mode": "local"}, "token_minted": false},
+  "spec_validation": "PASS (prior; not re-run this turn)",
+  "live_call": "NOT_RUN",
+  "assemblyai_key_last_check": "CONFIGURED; value never recorded",
+  "index": {"project": "Sparring", "mode": "fast", "generation": "2026-09-16T16:31:39Z", "nodes": 435, "edges": 1045, "tests_excluded_by_design": true},
+  "stop_reason": "Handoff items 1-5 completed; G1 blocked on human live call",
+  "next": "docs/LIVE-CHECK.md G1 with a person; do not treat 7 mock e2e as live"
+}

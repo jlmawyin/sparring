@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+.cache/
+.agents-runtime/
+playwright-report/
+test-results/
+output/playwright/
+*.log
+.codebase-memory/
