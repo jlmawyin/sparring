@@ -308,7 +308,7 @@ export function createVoiceController(
     pendingEvals.add(ev.call_id);
     try {
       const attempt = await attemptEvaluate(req, evaluate, TOOL_EVAL_TIMEOUT_MS, lastEvaluateAttempt);
-      lastEvaluateAttempt = req;
+      lastEvaluateAttempt = attempt.sent;
       if (myGeneration !== generation) return;
       const snapshot = attempt.status === 'accepted' ? attempt.response.snapshot : attempt.recovered?.snapshot;
       if (snapshot && !scoreFrozen && snapshot.revision > revision) {

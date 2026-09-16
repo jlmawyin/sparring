@@ -34,7 +34,7 @@
 
 ### Checkpoint Git
 
-Pendiente de registrar en el mismo turno: commit inicial de archivos autorizados, sin `.env` ni artefactos ignorados.
+`43261a6` en `master` (root). 64 archivos, sin `.env`, dist, test-results, output/playwright, node_modules ni `.cache`. No remoto.
 
 ### Comando de relevo manual
 

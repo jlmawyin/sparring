@@ -10,8 +10,8 @@ export class EvaluateIncompleteError extends Error {
 export type EvaluateFn = (req: EvaluateRequest, signal?: AbortSignal) => Promise<EvaluateResponse>;
 
 export type EvaluateAttempt =
-  | { status: 'accepted'; response: EvaluateResponse }
-  | { status: 'incomplete'; recovered?: EvaluateResponse };
+  | { status: 'accepted'; response: EvaluateResponse; sent: EvaluateRequest }
+  | { status: 'incomplete'; recovered?: EvaluateResponse; sent: EvaluateRequest };
 
 async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   let timer: ReturnType<typeof setTimeout>;
@@ -75,25 +75,26 @@ export async function attemptEvaluate(
   previous: EvaluateRequest | null,
 ): Promise<EvaluateAttempt> {
   try {
-    return { status: 'accepted', response: await evaluateWithRecovery(req, evaluate, timeoutMs) };
+    return {
+      status: 'accepted',
+      response: await evaluateWithRecovery(req, evaluate, timeoutMs),
+      sent: req,
+    };
   } catch (error) {
     if (!isRevisionConflict(error) || !previous || previous.tool_call_id === req.tool_call_id) {
-      return { status: 'incomplete' };
+      return { status: 'incomplete', sent: req };
     }
     try {
       const recovered = await evaluateWithRecovery(previous, evaluate, timeoutMs);
+      const retried = { ...req, revision: recovered.snapshot.revision };
       try {
-        const response = await evaluateWithRecovery(
-          { ...req, revision: recovered.snapshot.revision },
-          evaluate,
-          timeoutMs,
-        );
-        return { status: 'accepted', response };
+        const response = await evaluateWithRecovery(retried, evaluate, timeoutMs);
+        return { status: 'accepted', response, sent: retried };
       } catch {
-        return { status: 'incomplete', recovered };
+        return { status: 'incomplete', recovered, sent: previous };
       }
     } catch {
-      return { status: 'incomplete' };
+      return { status: 'incomplete', sent: req };
     }
   }
 }

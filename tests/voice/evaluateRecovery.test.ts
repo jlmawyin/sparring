@@ -82,7 +82,12 @@ describe('attemptEvaluate revision recovery', () => {
       return accepted(2);
     });
     const attempt = await attemptEvaluate(next, evaluate, 40, previous);
-    expect(attempt).toEqual({ status: 'accepted', response: accepted(2) });
+    expect(attempt.status).toBe('accepted');
+    if (attempt.status === 'accepted') {
+      expect(attempt.response).toEqual(accepted(2));
+      expect(attempt.sent.revision).toBe(1);
+      expect(attempt.sent.tool_call_id).toBe('call2');
+    }
     expect(evaluate.mock.calls.map(([body]) => [body.tool_call_id, body.revision])).toEqual([
       ['call2', 0],
       ['call1', 0],
@@ -100,6 +105,7 @@ describe('attemptEvaluate revision recovery', () => {
     expect(attempt.status).toBe('incomplete');
     if (attempt.status === 'incomplete') {
       expect(attempt.recovered?.snapshot.revision).toBe(1);
+      expect(attempt.sent.tool_call_id).toBe('call1');
     }
   });
 
@@ -107,6 +113,7 @@ describe('attemptEvaluate revision recovery', () => {
     const evaluate = vi.fn<EvaluateFn>(async () => {
       throw new Error('La revisión de la evaluación no coincide.');
     });
-    await expect(attemptEvaluate(req(), evaluate, 40, null)).resolves.toEqual({ status: 'incomplete' });
+    const attempt = await attemptEvaluate(req(), evaluate, 40, null);
+    expect(attempt).toMatchObject({ status: 'incomplete', sent: { tool_call_id: 'call1', revision: 0 } });
   });
 });
