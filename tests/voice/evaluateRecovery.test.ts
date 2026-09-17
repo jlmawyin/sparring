@@ -105,7 +105,30 @@ describe('attemptEvaluate revision recovery', () => {
     expect(attempt.status).toBe('incomplete');
     if (attempt.status === 'incomplete') {
       expect(attempt.recovered?.snapshot.revision).toBe(1);
-      expect(attempt.sent.tool_call_id).toBe('call1');
+      // The retried envelope (call2 @ revision 1) is the last one actually
+      // sent to the server, so it's what the next recovery must replay.
+      expect(attempt.sent).toMatchObject({ tool_call_id: 'call2', revision: 1 });
+    }
+  });
+
+  it('remembers the retried envelope, not the older previous one, when the retry itself times out twice', async () => {
+    // Server may accept `retried` (call2 @ revision 1) even though both its
+    // HTTP responses are lost. The next recovery attempt must replay
+    // `retried`, not the already-superseded `previous` (call1 @ revision 0).
+    const previous = req(0, 'call1');
+    const next = req(0, 'call2');
+    const evaluate = vi.fn<EvaluateFn>(async (body, signal) => {
+      if (body.tool_call_id === 'call2' && body.revision === 0) {
+        throw new Error('La revisión de la evaluación no coincide.');
+      }
+      if (body.tool_call_id === 'call1') return accepted(1);
+      return hang(signal); // retried (call2 @ revision 1): both attempts time out
+    });
+    const attempt = await attemptEvaluate(next, evaluate, 15, previous);
+    expect(attempt.status).toBe('incomplete');
+    if (attempt.status === 'incomplete') {
+      expect(attempt.recovered?.snapshot.revision).toBe(1);
+      expect(attempt.sent).toMatchObject({ tool_call_id: 'call2', revision: 1 });
     }
   });
 

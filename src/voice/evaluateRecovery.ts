@@ -91,7 +91,12 @@ export async function attemptEvaluate(
         const response = await evaluateWithRecovery(retried, evaluate, timeoutMs);
         return { status: 'accepted', response, sent: retried };
       } catch {
-        return { status: 'incomplete', recovered, sent: previous };
+        // `retried` may have been accepted server-side even though both its
+        // responses were lost (evaluateWithRecovery's own retry is
+        // idempotent by tool_call_id). It is the last envelope that could
+        // have been accepted, so the next recovery must replay it — not the
+        // older `previous`, which the server has already superseded.
+        return { status: 'incomplete', recovered, sent: retried };
       }
     } catch {
       return { status: 'incomplete', sent: req };

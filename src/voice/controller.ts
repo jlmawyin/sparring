@@ -308,8 +308,11 @@ export function createVoiceController(
     pendingEvals.add(ev.call_id);
     try {
       const attempt = await attemptEvaluate(req, evaluate, TOOL_EVAL_TIMEOUT_MS, lastEvaluateAttempt);
-      lastEvaluateAttempt = attempt.sent;
+      // A stop()/start() during this await bumps generation and resets
+      // lastEvaluateAttempt for the new session; never let this stale
+      // envelope clobber it after the fact.
       if (myGeneration !== generation) return;
+      lastEvaluateAttempt = attempt.sent;
       const snapshot = attempt.status === 'accepted' ? attempt.response.snapshot : attempt.recovered?.snapshot;
       if (snapshot && !scoreFrozen && snapshot.revision > revision) {
         revision = snapshot.revision;
@@ -322,12 +325,15 @@ export function createVoiceController(
         callbacks.onError('No se pudo evaluar la herramienta a tiempo.');
       }
     } catch {
-      lastEvaluateAttempt = req;
       if (myGeneration !== generation) return;
+      lastEvaluateAttempt = req;
       gate.setResult(ev.call_id, JSON.stringify({ error: 'evaluate_failed_or_timeout' }), true);
       callbacks.onError('No se pudo evaluar la herramienta a tiempo.');
     } finally {
-      pendingEvals.delete(ev.call_id);
+      // A call_id can be reused by a later generation; only this generation's
+      // own entry may be cleared, or a late finisher could erase a new
+      // in-flight eval and let finish()'s drain end early.
+      if (myGeneration === generation) pendingEvals.delete(ev.call_id);
     }
     flushReadyToolResults();
   }

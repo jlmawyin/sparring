@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-09-17T01:43:23Z",
+  "local_date": "2026-09-16",
+  "review_base_commit": "4dee0e4",
+  "scope": "Review Grok handoff; targeted CLI delegation and integration verification",
+  "delegate": {"cli":"Claude","model_requested":"sonnet","effort":"medium","session":"eb71e77c-d4d3-4dfb-a1a9-d8ab92963bed","completed_tasks":2},
+  "fixes": ["Preserve retried envelope after ambiguous timeout", "Reject stale session recovery writes and pending cleanup"],
+  "regression": {"unit":"double timeout after recovered revision","browser":"held evaluate response after stop/restart","delegate_observed_old_code_fail_and_fixed_code_pass":true},
+  "validation": {
+    "typecheck":{"exit_code":0},
+    "unit":{"exit_code":0,"passed":119,"failed":0,"files":7},
+    "build":{"exit_code":0,"client_secret_markers_found":false},
+    "e2e":{"exit_code":0,"passed":8,"failed":0,"duration_seconds":16.6,"provider":"MOCK"},
+    "spec":{"exit_code":0},
+    "historical_checkpoint_json":"Syntax repaired and parsed successfully"
+  },
+  "live_gate":"NOT_RUN; pending human practice",
+  "provider_tokens_minted_by_review":false,
+  "quota_snapshot":{"five_hour_remaining_percent":47,"weekly_remaining_percent":63,"ordinary_usage_allowed":true,"scope":"account shared"},
+  "graph":{"project":"Sparring","generation":"2026-09-17T01:43:22Z","mode":"fast","nodes":435,"edges":1045,"limitations":"Source still reported metadata_changed; tests/docs excluded; direct source and diff reviewed"},
+  "next":"Human G1 in docs/LIVE-CHECK.md; then delegate next accepted phase"
+}

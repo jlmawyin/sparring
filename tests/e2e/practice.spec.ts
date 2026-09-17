@@ -15,12 +15,13 @@ const baseSnapshot = (): ScoreSnapshot => ({revision:0,coverage:0,total:null,pro
 async function mockApi(page: Page, keyConfigured = true) {
   const requests: Record<string, unknown>[] = [];
   let snapshot = baseSnapshot();
+  let startCount = 0;
   await page.route('**/api/**', async route => {
     const path = new URL(route.request().url()).pathname;
     let body: unknown;
     if (path === '/api/catalog') body = catalog;
     else if (path === '/api/health') body = {status:'ok',key_configured:keyConfigured,voice_enabled:true,mode:'local'};
-    else if (path === '/api/session/start') body = {session_id:'test-session',session_context:'mock-context',token:'MOCK_ONLY',max_seconds:240,deadline:Date.now()+240000,session_config:{system_prompt:'Simulación de prueba automatizada.',greeting:'Llegó tarde.',output:{voice:'lola'}}};
+    else if (path === '/api/session/start') { startCount += 1; body = {session_id:'test-session',session_context:`mock-context-${startCount}`,token:'MOCK_ONLY',max_seconds:240,deadline:Date.now()+240000,session_config:{system_prompt:'Simulación de prueba automatizada.',greeting:'Llegó tarde.',output:{voice:'lola'}}}; }
     else if (path === '/api/evaluate') {
       const payload = route.request().postDataJSON(); requests.push(payload);
       // Verify request contract independently of the response implementation.
@@ -156,6 +157,58 @@ test('stopping and immediately restarting survives the old socket closing later'
   await expect(page.getByRole('alert')).toHaveCount(0);
   expect(connections).toBe(2);
   await page.getByRole('button',{name:'Cortar audio'}).click();
+});
+
+test('stop→restart never lets a stale in-flight evaluate response leak the old session_context into new recovery', async ({page}) => {
+  const {requests} = await mockApi(page);
+  const held: any[] = [];
+  await page.route('**/api/evaluate', async route => {
+    const payload = route.request().postDataJSON();
+    requests.push(payload);
+    if (payload.tool_call_id === 'a1') { held.push(route); return; } // simulate an abandoned/late HTTP response
+    await route.fulfill({status:409, json:{error:'revision_conflict', message:'La revisión de la evaluación no coincide.'}});
+  });
+  const sockets: any[] = [];
+  let connections = 0;
+  await page.routeWebSocket('wss://agents.assemblyai.com/**', ws => {
+    const connection = ++connections;
+    sockets[connection - 1] = ws;
+    ws.onMessage(raw => {
+      if (JSON.parse(String(raw)).type === 'session.update') ws.send(JSON.stringify({type:'session.ready',session_id:`s${connection}`}));
+    });
+  });
+
+  await page.goto('/'); await page.getByRole('checkbox').check();
+  await page.getByRole('button',{name:'Iniciar práctica'}).click();
+  await expect(page.getByText('Conversación en curso')).toBeVisible();
+  const toolCall = (id: string) => JSON.stringify({type:'tool.call',call_id:id,name:'score_rubric',arguments:{observations:[{criterion_id:'empathy',level:3,quote,occurrence:1,rationale:'x'}]}});
+  sockets[0].send(JSON.stringify({type:'transcript.user',item_id:'u1',text:quote}));
+  sockets[0].send(toolCall('a1'));
+  await expect.poll(() => held.length).toBe(1); // session A's evaluate is now stuck in flight
+
+  await page.getByRole('button',{name:'Cortar audio'}).click();
+  await page.getByRole('button',{name:'Volver a practicar'}).click();
+  await page.getByRole('button',{name:'Iniciar práctica'}).click();
+  await expect(page.getByText('Conversación en curso')).toBeVisible();
+  sockets[1].send(JSON.stringify({type:'transcript.user',item_id:'u2',text:quote}));
+  sockets[1].send(toolCall('b1'));
+  await expect.poll(() => requests.some(r => r.tool_call_id === 'b1')).toBe(true);
+
+  const ctxA = requests.find(r => r.tool_call_id === 'a1')!.session_context;
+  const ctxB = requests.find(r => r.tool_call_id === 'b1')!.session_context;
+  expect(ctxA).not.toBe(ctxB);
+  const ctxARequestsBefore = requests.filter(r => r.session_context === ctxA).length;
+
+  // Release the old session's stale response as a late accept. If the
+  // controller's generation guard were removed, this would overwrite the
+  // new session's recovery envelope with session A's stale context.
+  await held[0].fulfill({status:200, json:{snapshot:{revision:1,criteria:[],coverage:20,total:null,provisional:true,limitations:[],next_action:'x'},result:{accepted:true},processing_ms:1}});
+
+  sockets[1].send(toolCall('b2'));
+  await expect.poll(() => requests.some(r => r.tool_call_id === 'b2')).toBe(true);
+  await page.waitForTimeout(300);
+  expect(requests.filter(r => r.session_context === ctxA).length).toBe(ctxARequestsBefore);
+  for (const leftover of held.slice(1)) await leftover.fulfill({status:200,json:{snapshot:{revision:1,criteria:[],coverage:20,total:null,provisional:true,limitations:[],next_action:'x'},result:{accepted:true},processing_ms:1}});
 });
 
 test('network close releases the server session and allows a new practice', async ({page}) => {

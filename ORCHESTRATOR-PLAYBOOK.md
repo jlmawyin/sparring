@@ -1,6 +1,8 @@
 # Playbook de orquestación multiagente
 
-Versión 1.1 · reutilizable para hackathons, prototipos y proyectos de ingeniería
+Versión 1.2 · reutilizable para hackathons, prototipos y proyectos de ingeniería
+
+Regla de relevo y consumo: al regresar un orquestador, leer el checkpoint vigente, comprobar Git y revisar sólo el cambio relevante. Encargar a CLI externos con capacidad comprobada la implementación y correcciones con criterios de aceptación. El orquestador conserva contratos, decisiones y verificación de integración. No reenviar el chat entero ni duplicar auditorías. Los subagentes internos comparten el cupo del orquestador; usarlos sólo con ventaja concreta. Consultar cuota antes y después de cada lote y detenerse al aviso de reserva. Toda revisión debe ser acotada por archivos y devolver evidencia breve; las CLI que fallan por entorno necesitan diagnóstico, no prompts repetidos.
 
 Lección del primer ciclo de programación: definir contratos compartidos antes de delegar. Que un módulo pase sus tests unitarios no acredita la integración. El orquestador debe probar al menos un recorrido completo con respuestas del proveedor fieles a su documentación, y después separar esa evidencia de una prueba real. Las CLI pueden informar costes nominales sin que éstos sean facturación cobrada ni porcentaje de suscripción; no inferir cuota de esos campos. Autorizar explícitamente sólo los comandos de verificación necesarios para evitar loops de peticiones de permiso. Ante una denegación, reportar una vez y dejar que el coordinador ejecute la prueba, sin repetirla ni habilitar bypass global.
 

@@ -60,6 +60,8 @@ El límite --max-budget-usd de Claude es un guard de esa ejecución según su CL
 
 ## Registro de esta sesión
 
+Actualización16sep2026 20:43ECT: Codex retomó desde4dee0e4 y delegó a Claude Sonnet medium dos encargos acotados: revisar recuperación/cuotas y añadir regresión de HTTP tardío al reiniciar. Claude corrigió el sobre de recuperación y los guards de generación, con tests; el padre verificó119unitarias,8E2E,tipos/build y especificaciones. No se inició voz real. Agy no se relanzó tras su error de capacidad; Grok no repitió el lote que ya había entregado. La cuota de Codex se consultó al abrir/cerrar y durante el lote:100→75→47%5h (uso compartido, no atribución exclusiva). Protocolo neutral actualizado en playbook1.2. Evidencia en docs/evidence/codex-review-2026-09-16.json.
+
 | Tarea | Resultado | Evaluación del orquestador |
 |---|---|---|
 | Claude-SDD intento1 | Error OAuth antes de inferencia, coste reportado0 | Sin archivos; retomó Codex. No afirmar revisión Claude realizada |

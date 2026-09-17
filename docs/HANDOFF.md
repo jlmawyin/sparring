@@ -1,10 +1,22 @@
 # Relevo de Sparring
 
-## CHECKPOINT VIGENTE — 2026-09-16 20:09 ECT
+## CHECKPOINT VIGENTE — 2026-09-16 20:43 ECT
 
-**Leer esta sección primero. El contenido posterior a HISTÓRICO está superado.** Orquestador principal: **Codex de nuevo**. Grok CLI 4.6 cerró el lote que Codex dejó pendiente al agotar la ventana 5h. No reiniciar planificación. Prompt listo: `docs/task-codex-resume.txt`.
+**Orquestador principal: Codex. Revisión del relevo completada.** No recontar el chat ni repetir planificación. La siguiente dependencia sigue siendo G1 con voz humana; no hay que volver a insertar la clave ni repetir la auditoría ya cerrada.
 
-### Transmisión Grok → Codex (lo hecho, no repetir)
+### Revisión posterior de Codex (estado actual)
+
+- Se conservó el trabajo de Grok y se delegó a Claude CLI/Sonnet medium una revisión acotada. Corrigió dos defectos: recordar el último sobre reenviado tras doble timeout y evitar que una respuesta HTTP de una sesión anterior sobrescriba el contexto de recuperación de la nueva. El cleanup de pendientes también respeta la generación.
+- Regresión de timeout en Vitest; regresión stop→restart con respuesta HTTP retenida en Playwright. Claude comprobó que esta última falla con el guard antiguo y pasa con el fix. El padre revisó el diff y ejecutó la suite integrada.
+- **Verificación final: typecheck PASS, 119/119 unitarias (7 archivos), build PASS, 8/8 E2E (16.6s), validate:spec PASS.** Proveedor simulado en todas las pruebas. Bundle sin marcadores de clave/Bearer. Evidencia: `docs/evidence/codex-review-2026-09-16.json`.
+- Se reparó un cierre de llave extra que hacía inválido el JSON del checkpoint Grok; se preservaron sus datos históricos. AGENTS y playbook1.2 refuerzan delegación por capacidades, contexto pequeño, revisión por lotes y reserva de cuota. La planificación antigua se separó al archivo enlazado al final.
+- App local seguía respondiendo en5173/8787; health confirmó clave configurada y voz habilitada sin leer el secreto. Se solicitó disponibilidad del usuario para práctica90s; no hay resultado humano recibido ni sesión real iniciada por Codex. **G1 LIVE_NOT_RUN.** No abrir tokens automáticamente.
+- Cuota al cerrar lote: **47%5h / 63%semanal**, ordinaryUsageAllowed=true (01:43UTC). Es cuenta compartida, no gasto atribuible sólo a esta tarea. Sin resets ni extra usage activados. Agentes externos: cuota DESCONOCIDA, sin aviso recibido≤10%.
+- Claude terminó ambos encargos; sesión `eb71e77c-d4d3-4dfb-a1a9-d8ab92963bed`, salidas ignoradas `.agents-runtime/claude-resume-{review,browser-test}.json`. No agentes de esta revisión pendientes. No reactivar worker interno anterior.
+- Memoria reindexada con nombre explícito Sparring, fast, generación `2026-09-17T01:43:22Z`,435nodos/1045aristas. Coverage aún informa metadata_changed para los3archivos fuente y excluye tests/docs por diseño: se usó lectura directa y diff; no afirmar cobertura exhaustiva por reindexar.
+- Git base revisada4dee0e4. Consultar `git log -1 --oneline` para el nuevo commit de correcciones; sin remoto ni publicación. No tocar `.env`.
+
+### Transmisión Grok → Codex (lote anterior, conservar sin repetir)
 
 Grok asumió orquestación temporal según `docs/task-grok-handoff.txt` y el CHECKPOINT de 11:33 ECT. Completó los ítems 1–5 de ese checkpoint. Un ciclo de solución, sin reintentos ciegos.
 
@@ -36,9 +48,9 @@ Grok asumió orquestación temporal según `docs/task-grok-handoff.txt` y el CHE
 
 ### Próximo trabajo concreto (Codex)
 
-1. Comprobar cupo propio (`get_usage_limits` o equivalente). Si 5h sigue ~0% o `ordinaryUsageAllowed=false`, no despachar lotes; G1 humano no gasta Codex. Si recuperó, orquestar con margen de parada 10%. Sin resets ni extra usage.
+1. Comprobar cupo propio antes del siguiente lote; no reutilizar porcentajes históricos. Orquestar con margen de parada10%, sin resets ni extra usage.
 2. **G1 con persona** — `docs/LIVE-CHECK.md`. Si `npm run dev` cayó: relanzar, health, no mintear token hasta gesto+consentimiento. Una llamada ≤4 min. No declarar G1 por e2e mock.
-3. Revisión padre del diff Grok (`evaluateRecovery` + cuotas). No revertir. Si G1 pasa: anotar LIVE-CHECK y seguir PLAN (PWA/historial, cuota distribuida, submission). No desplegar adaptador Map local.
+3. La revisión padre del diff Grok ya está cerrada arriba. Si G1 pasa: anotar LIVE-CHECK y seguir PLAN (PWA/historial, cuota distribuida, submission), delegando implementación por archivos con pruebas. No desplegar adaptador Map local.
 
 ### Agentes
 
@@ -52,64 +64,4 @@ Grok asumió orquestación temporal según `docs/task-grok-handoff.txt` y el CHE
 
 Leer `docs/task-codex-resume.txt` (también abajo). Pegar en Codex desde esta carpeta. No usar el prompt histórico de planificación.
 
-## HISTÓRICO — planificación previa (no estado vigente)
-
-Actualizado: 2026-09-15 ECT / 2026-09-16 UTC. Orquestador: Codex. Sustituto solicitado: Grok CLI 4.6. Este documento es un checkpoint, no indicación de que Codex agotó cuota.
-
-## Estado real
-
-- Preparación SDD terminada y validada: node scripts/validate-spec.mjs terminó con exitcode0 y PASS. Evidencia en docs/evidence/planning-validation.json; sólo consistencia de especificación, producto NOT_RUN.
-- Carpeta inicialmente vacía; hoy contiene documentos, prompts y contratos/fixtures. No app, deployment, API calls de voz, video, PDF ni submission.
-- Se investigó evento, guías, docs AAI actuales y competencia. Hora exacta de cierre, MIT específico, equipo/eligibilidad e IBM Bob quedan pendientes de portal autenticado.
-- Se clonó starter en .cache (ignorado), commit11b4c9508bef682785e8bdf23d5170b30aafb7a6; no se ejecutó. No se encontró archivo LICENSE en revisión inicial; no copiar al código MIT hasta resolver licencia.
-- Reindexación al cierre: Sparring fast,161nodos/160aristas; índice excluye docs y scripts por diseño, además de .cache y .agents-runtime. Leer directamente esas rutas para validar; no interpretar exclusión como ausencia. Pedir index_status/check_index_coverage para generación vigente.
-- En la comprobación de esta sesión, Grok quedó autenticado en grok.com con grok-4.6; Agy respondió AUTH_OK con gemini-3.8-flash-low sin herramientas. Claude reportó loggedIn:false y ahora tiene un flujo claude auth login abierto, esperando que el usuario complete el navegador/código. No afirmar revisión de Claude/Grok realizada.
-- Memoria estructural al cierre: proyecto Sparring, generación 2026-09-16T04:49:11Z, modo fast, estado ready, 161 nodos/160 aristas. `docs/`, `scripts/`, `.cache/` y `.agents-runtime/` están excluidos por diseño; se leyeron directamente las rutas relevantes. No hay repo Git propio todavía.
-- AGENTS.md fija reglas de coordinación, cuotas y3interacciones. No se activaron resets ni compras.
-
-## Próxima orden concreta
-
-Ejecutar P1 de docs/PROMPTS.md, luego P2. Puede programarse y probarse offline aunque falte API key. G1 sólo cierra con llamada real en español y herramientas de scoring antes del final. No gastar tiempo en UI completa antes de demostrar voz+tool.
-
-1. Confirmar autenticación y cuota externa. Para Grok, modelo grok-4.6 debe aparecer en grok models y login ser válido; para Claude, auth status no basta si refresh falla.
-2. Consultar index_status del grafo Sparring y coverage para código nuevo; estado inicial fast generation2026-09-16T04:28:37Z,2nodes/1edge y cero funciones, documentos posteriores fuera de esa referencia.
-3. Leer SDD, TEST-PLAN y tools/scenarios/rubric. Ejecutar node scripts/validate-spec.mjs.
-4. Crear proyecto app con scripts de build/tests y lockfile. Respetar separación voice/domain/ui y sin secretos cliente.
-5. Preparar .env local sin imprimir valores; si no hay acceso a AAI, dejar spike mock etiquetado y gate LIVE_BLOCKED.
-6. Registrar resultados, revisar cambios y actualizar este archivo antes de un relevo.
-
-## Decisiones a preservar
-
-- React/Vite TypeScript, funciones HTTP Vercel, browser WSS directo con token efímero.
-- Inline config con tools cliente, no agent_id mezclado.
-- Roleplay180s, finalización≤20s y coaching≤40s dentro240s totales.
-- Score propuesto por actor, evidencia validada servidor, matemática determinista; formativo, no antifraude ni científicamente validado.
-- Cinco criterios20/20/25/20/15, niveles0..4/null y totalnull si cobertura<60%.
-- start_scenario/save_session app; log_objection/score_rubric tools reales.
-- Historial local opt in, no audio grabado por app; revisar retención del proveedor.
-- Cuota global atómica y kill switch antes de demo pública. Reserva minutos incluso en desconexión.
-- No prometer interrupción agente→humano hasta pasarT20; humano→agente se prueba enT03.
-
-## Pendientes del usuario (ya preguntados, no repetir sin necesidad)
-
-- Cupo/facturación de Claude, Grok y Agy, horas humanas disponibles e integrantes.
-- Restaurar login Claude y Grok.
-- Portal lablab: hora/zona exacta y requisitos MIT/IBM Bob; equipo creado además de Enrolled.
-- API key por archivo local y confirmación de acceso/saldo, antes de primera llamada. No enviar por chat.
-- GitHub/hosting al preparar publicación. No necesarios para trabajar en contratos.
-
-## Cuotas y relevo
-
-Consulta inicial Codex:97% restante5h y97% semanal. Última consulta antes de cierre de planificación:41% restante5h y88% semanal; saldo de créditos sin cambio, sin resets consumidos. Fuente: get_usage_limits de la app. Es una foto, no estado perpetuo; reconsultar antes de despachar. Externos UNKNOWN, sin aviso recibido de≤10%; autenticación y cuota son distintos. Al aviso cercano al umbral: parar nuevos lotes, guardar trabajo/estado de procesos, actualizar uso+fuente+reset, diffs/commit, pruebas y siguiente comando. Relevo manual hacia Grok4.6 autenticado con cupo; no hay cambio automático garantizado.
-
-No quedan procesos CLI activos de estas tareas. Las salidas brutas se guardaron en .agents-runtime. El directorio no se convirtió aún en repositorio Git propio ni se creó commit; hacerlo al iniciar implementación después de comprobar si hay repositorio padre.
-
-## Plantilla de actualización
-
-Último commit/diff: <consultar git, no inventar>.
-Gate actual / tarea / dueño / archivos: <...>.
-Pruebas y evidencias: <comando, exitcode, ruta, mock/live>.
-Agentes activos y sesión reanudable: <...>.
-Cuotas / hora / reset natural: <...>.
-Bloqueos y trabajo independiente: <...>.
-Siguiente orden mínima: <...>.
+La planificación anterior está archivada en [HANDOFF-PLANNING-ARCHIVE.md](HANDOFF-PLANNING-ARCHIVE.md). No leerla al retomar salvo que haga falta una decisión histórica.
