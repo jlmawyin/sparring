@@ -12,7 +12,7 @@
   "live_call": "NOT_RUN",
   "assemblyai_key_last_check": "CONFIGURED; value never recorded",
   "index": {"project": "Sparring", "mode": "fast", "generation": "2026-09-16T16:31:39Z", "nodes": 435, "edges": 1045, "tests_excluded_by_design": true},
-  "git": {"commit": "43261a6", "branch": "master", "root": true, "remote": false},
-  "stop_reason": "Handoff items 1-5 completed; G1 blocked on human live call",
-  "next": "docs/LIVE-CHECK.md G1 with a person; do not treat 7 mock e2e as live"
+  "git": {"head": "34fab80", "root": "43261a6", "branch": "master", "remote": false},
+  "stop_reason": "Grok handoff closed; Codex resumes as orchestrator; G1 blocked on human live call",
+  "next": "Codex: check own quota, then docs/LIVE-CHECK.md G1; prompt in docs/task-codex-resume.txt"}
 }

@@ -1,0 +1,14 @@
+Eres de nuevo el orquestador principal de Sparring. Grok CLI 4.6 cerró el lote que dejaste al agotar la ventana 5h. Lee CHECKPOINT VIGENTE al inicio de docs/HANDOFF.md, AGENTS.md y docs/evidence/implementation-checkpoint.json. No reinicies planificación. No reescribas voz/servidor/UI. No reviertas el diff de Grok.
+
+Hecho por Grok (verificar git log 43261a6..34fab80, no repetir):
+- typecheck, npm test 118/118, build, e2e 7/7 MOCK. El lote tests/server/app.test.ts ya está recogido.
+- SPARRING_MAX_SESSION_SECONDS y SPARRING_DAILY_MINUTES_CAP honorados (60..240 y 1..30) en reserva/deadline/token. Tests añadidos.
+- Timeout evaluate 3s: src/voice/evaluateRecovery.ts + controller; reintento idéntico o incompleto; nunca éxito inventado. tests/voice/evaluateRecovery.test.ts.
+- Dev local 5173/8787. Health key_configured=true voice_enabled=true mode=local. Clave no leer ni imprimir. Ningún token real. G1 LIVE_NOT_RUN.
+- Git master local HEAD 34fab80, root 43261a6, sin remoto, sin .env.
+
+Tu primer acto: consultar cupo. Si ordinaryUsageAllowed=false o ~0% en 5h, no despachar agentes; el humano puede hacer G1 igual. Si hay cupo, margen de parada 10%. Sin resets ni extra usage.
+
+Siguiente gate: G1 según docs/LIVE-CHECK.md (persona, late_delivery, 90s español, 2 updates, barge-in, coach, Cortar audio). No afirmar G1 por e2e. Si G1 pasa, registrar LIVE-CHECK y continuar PLAN (historial/PWA, contador distribuido, submission). No desplegar el adaptador HTTP local.
+
+Memoria: reindexar si usas el grafo; generación Grok 2026-09-16T16:31:39Z 435n/1045e fast; tests y docs excluidos por diseño. Contratos src/shared/types.ts.

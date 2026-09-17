@@ -1,44 +1,56 @@
 # Relevo de Sparring
 
-## CHECKPOINT VIGENTE — 2026-09-16 11:33 ECT
+## CHECKPOINT VIGENTE — 2026-09-16 20:09 ECT
 
-**Leer esta sección primero. El contenido posterior a HISTÓRICO está superado.** Orquestador en este turno: Grok CLI 4.6, relevo pedido por Jorge. Codex sigue detenido (`ordinaryUsageAllowed=false` en el checkpoint previo, 0% de cinco horas, 71% semanal; reset5h Unix1789586852). No se canjearon resets ni se habilitó gasto adicional. No despachar tareas a Codex hasta recuperar cupo verificado. Cuota Grok: DESCONOCIDO; no hay telemetría en esta sesión. Parar al aviso ≤10%.
+**Leer esta sección primero. El contenido posterior a HISTÓRICO está superado.** Orquestador principal: **Codex de nuevo**. Grok CLI 4.6 cerró el lote que Codex dejó pendiente al agotar la ventana 5h. No reiniciar planificación. Prompt listo: `docs/task-codex-resume.txt`.
 
-### Implementado en este relevo
+### Transmisión Grok → Codex (lo hecho, no repetir)
 
-- Suite verificada de padre, sin ocultar fallos: `npm run typecheck` exit 0; `npm test` **118/118 PASS** (7 archivos, incluye `tests/server/app.test.ts` 60 casos y `tests/voice/evaluateRecovery.test.ts` 7 casos); `npm run build` exit 0, Vite 8.3.0, 29 módulos, `dist/assets/index-BAoVxe85.js` 251 kB / gzip 78.85 kB. Bundle sin literales `ASSEMBLYAI_API_KEY` ni `Bearer`.
-- `npm run test:e2e` **7/7 PASS**, 15.3s. Seis con API simulada; `tests/e2e/full-stack.spec.ts` usa servidor Node real y AssemblyAI simulado (vector 3/2/1/4/2 → 59, cobertura 100). **No es llamada real.**
-- `server/app.ts` honra `SPARRING_MAX_SESSION_SECONDS` (60–240, defecto 240) y `SPARRING_DAILY_MINUTES_CAP` (1–30, defecto 30): misma cifra en reserva, deadline, `max_seconds` y `max_session_duration_seconds` del token. Enteros inválidos caen al defecto; fuera de rango se acotan. Tests HTTP cubren 90s, tope diario 1 min con sesiones de 60s, y clamp/default.
-- Timeout HTTP de evaluación 3s: `src/voice/evaluateRecovery.ts` reintenta el mismo sobre (el servidor ya es idempotente). Si llega `revision_conflict`, rejuega el sobre anterior y reintenta. Si no hay snapshot, declara incompleto y no inventa éxito. Una evaluación tardía aceptada puede actualizar la revisión visible; el tool.result de ese call sigue siendo error si no se recuperó a tiempo.
-- App local en ejecución: `npm run dev` (5173 web / 8787 api). `GET /api/health` → `{status:ok,key_configured:true,voice_enabled:true,mode:local}`. UI abierta en Chromium: tres casos, consentimiento requerido, Iniciar deshabilitado sin checkbox, sin overflow a 360px. Capturas `output/playwright/dev-{desktop,mobile}.png` (ignoradas). **No se inició práctica ni se pidió token al proveedor.**
-- Clave local: KEY_CONFIGURED=true, SPARRING_VOICE_ENABLED=true. Valor nunca leído en chat ni herramientas. G1 sigue LIVE_NOT_RUN hasta persona + 90s + 2 updates (docs/LIVE-CHECK.md).
-- Memoria reindexada fast: proyecto Sparring, generación 2026-09-16T16:31:39Z, 435 nodos / 1045 aristas, ready. `docs/`, `scripts/`, `tests/e2e/` y `tests/**/*.test.ts` excluidos por diseño (fast-pattern). Afirmaciones de código de tests se leyeron en fuente. Cobertura de `server/app.ts` y `src/voice/*` sin parse_partial.
+Grok asumió orquestación temporal según `docs/task-grok-handoff.txt` y el CHECKPOINT de 11:33 ECT. Completó los ítems 1–5 de ese checkpoint. Un ciclo de solución, sin reintentos ciegos.
 
-### Evidencia
+**Verificado (comandos reales, exit 0):**
+- `npm run typecheck`
+- `npm test` **118/118** (7 archivos). Incluye el lote server que el padre no había recogido (`tests/server/app.test.ts`, 60 casos) y 7 casos nuevos de recuperación.
+- `npm run build` — Vite 8.3.0, `dist/assets/index-BAoVxe85.js` ~251 kB. Grep de `dist/` sin `ASSEMBLYAI_API_KEY` ni `Bearer`.
+- `npm run test:e2e` **7/7**, 15.3s. Proveedor **MOCK**. `full-stack.spec.ts` = HTTP Node real + AssemblyAI simulado (3/2/1/4/2 → 59, cobertura 100). **No es G1.**
 
-- `docs/evidence/implementation-checkpoint.json` actualizado con comandos, exit codes y mock vs live.
-- Git: ver “Checkpoint Git” abajo. `.env`, dist, test-results, output/playwright, node_modules, `.cache`, `.agents-runtime` ignorados.
+**Código propio de este relevo (revisar diff, no reescribir):**
+- `server/app.ts` — `SPARRING_MAX_SESSION_SECONDS` 60–240 (defecto 240) y `SPARRING_DAILY_MINUTES_CAP` 1–30 (defecto 30). Misma cifra en reserva, deadline, `max_seconds` y `max_session_duration_seconds`. Inválido → defecto; fuera de rango → clamp.
+- `tests/server/app.test.ts` — fixture fusiona `env`; tests 90s, tope 1 min con sesiones de 60s, clamp/default.
+- `src/voice/evaluateRecovery.ts` **nuevo** — timeout 3s, reintento idéntico (servidor ya idempotente), replay si `revision_conflict`, incompleto sin inventar éxito. El sobre `sent` es el que el servidor aceptó, no el envelope obsoleto.
+- `src/voice/controller.ts` — `handleToolCall` usa `attemptEvaluate`; snapshot tardío puede actualizar revisión visible; tool.result de ese call sigue error si no se recuperó.
+- `tests/voice/evaluateRecovery.test.ts` **nuevo** — 7 casos.
+- README y `server/README.md` documentan las variables. No se tocó el starter en `.cache`.
 
-### Próximo trabajo concreto
+**No hecho / no afirmar:**
+- G1 LIVE_NOT_RUN. Ningún token AssemblyAI real. Ninguna práctica iniciada.
+- PWA, historial, contador distribuido, calibración, video/slides/submission: pendientes según PLAN.
+- `npm run validate:spec` no se reejecutó en este turno (PASS previo).
 
-1. **G1 con persona** según docs/LIVE-CHECK.md: Chrome/Edge, Entrega demorada, ≥90s en español, 2 updates durante roleplay, barge-in humano, coaching y Cortar audio. Una llamada ≤4 min. No repetir si hay error persistente o consumo imprevisto. No declarar G1 por los 7 e2e mock.
-2. Si G1 pasa: registrar resultado literal en LIVE-CHECK (discrepancias transcripción, n updates, gasto observado en cuenta). Luego PWA/historial, contador distribuido y material de submission según PLAN. No desplegar el adaptador Map local.
-3. Codex: no despachar hasta cupo 5h recuperado. Claude: no reanudar sin revisar cupo. Agy: no reintentar el ciclo 503 a ciegas.
+**Entorno al cerrar transmisión (20:09 ECT):**
+- `npm run dev` seguía respondiendo: 5173 web, 8787 api. Health `{status:ok,key_configured:true,voice_enabled:true,mode:local}`. Loopback only.
+- Clave: KEY_CONFIGURED=true, SPARRING_VOICE_ENABLED=true. Valor nunca leído ni impreso.
+- Git `master` local, sin remoto: `43261a6` root (64 archivos autorizados) → HEAD `34fab80` (sobre accepted + SHA en HANDOFF). `.env` ignorado.
 
-### Agentes y procesos
+**Memoria:** Sparring fast, generación `2026-09-16T16:31:39Z`, 435 nodos / 1045 aristas, ready. Excluidos por diseño: `docs/`, `scripts/`, `tests/e2e/`, `tests/**/*.test.ts` (fast-pattern). Tests leídos en fuente. Tras más código, reindexar; no reutilizar conclusiones del índice 161 nodos.
 
-- Este turno: Grok 4.6 en TUI, orquestación asumida. No se delegó a Claude/Agy/Codex.
-- Codex: detenido por cuota 5h. Trabajador interno previo interrumpido; no reactivar.
-- Dev local dejado activo en loopback 5173/8787 para que Jorge pueda hacer G1. No es un servidor público.
-- Cuotas externas DESCONOCIDAS. Máximo 3 interacciones por evaluación Grok/Agy.
+### Próximo trabajo concreto (Codex)
 
-### Checkpoint Git
+1. Comprobar cupo propio (`get_usage_limits` o equivalente). Si 5h sigue ~0% o `ordinaryUsageAllowed=false`, no despachar lotes; G1 humano no gasta Codex. Si recuperó, orquestar con margen de parada 10%. Sin resets ni extra usage.
+2. **G1 con persona** — `docs/LIVE-CHECK.md`. Si `npm run dev` cayó: relanzar, health, no mintear token hasta gesto+consentimiento. Una llamada ≤4 min. No declarar G1 por e2e mock.
+3. Revisión padre del diff Grok (`evaluateRecovery` + cuotas). No revertir. Si G1 pasa: anotar LIVE-CHECK y seguir PLAN (PWA/historial, cuota distribuida, submission). No desplegar adaptador Map local.
 
-`43261a6` en `master` (root). 64 archivos, sin `.env`, dist, test-results, output/playwright, node_modules ni `.cache`. No remoto.
+### Agentes
 
-### Comando de relevo manual
+- Grok 4.6: lote cerrado. No asignarle de nuevo las mismas pruebas/cuotas/timeout.
+- Claude: 3 lotes voz ya hechos; no reanudar sin cupo. Sesión previa `da4c0a80-7b63-4b73-af32-ef9c573f4a46`.
+- Agy: ciclo 503 descartado; no reintento ciego.
+- Codex worker `/root/local_backend`: interrumpido por cuota; no reactivar en frío. El padre ya recogió sus tests (118 PASS).
+- Cuota Grok: DESCONOCIDO. Parar al aviso ≤10%. Máximo 3 interacciones Grok/Agy por evaluación nueva.
 
-Si hay que ceder el turno: leer este CHECKPOINT y continuar por G1 (LIVE-CHECK) o, si el servidor local no está arriba, `npm run dev` y repetir health. No reiniciar planificación.
+### Comando de relevo a Codex
+
+Leer `docs/task-codex-resume.txt` (también abajo). Pegar en Codex desde esta carpeta. No usar el prompt histórico de planificación.
 
 ## HISTÓRICO — planificación previa (no estado vigente)
 
