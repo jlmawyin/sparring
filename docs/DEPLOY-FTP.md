@@ -10,6 +10,7 @@ La aplicación usa dos grupos de secretos separados:
 Desde la raíz del proyecto, en PowerShell:
 
 ```powershell
+.\scripts\secretos.ps1 -Guardar SPARRING_FTP_USER
 .\scripts\secretos.ps1 -Guardar SPARRING_FTP_PASS
 ```
 
@@ -28,7 +29,7 @@ FTP_HOST=ftp.mawyin.net
 FTP_TLS_HOST=single-2030.banahosting.com
 FTP_PORT=21
 FTP_MODE=explicit TLS
-FTP_USER=datai@sparring.visitaremota.com
+FTP_USER=(cargado desde DPAPI local)
 PUBLIC_URL=https://sparring.visitaremota.com
 ```
 

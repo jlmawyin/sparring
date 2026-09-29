@@ -10,11 +10,11 @@ param()
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'secretos.ps1') -Cargar | Out-Null
 
-if ([string]::IsNullOrEmpty($env:SPARRING_FTP_PASS)) {
-  throw 'No se pudo cargar SPARRING_FTP_PASS desde DPAPI.'
+if ([string]::IsNullOrEmpty($env:SPARRING_FTP_USER) -or [string]::IsNullOrEmpty($env:SPARRING_FTP_PASS)) {
+  throw 'No se pudieron cargar SPARRING_FTP_USER y SPARRING_FTP_PASS desde DPAPI.'
 }
 
-$ftpUser = 'datai@sparring.visitaremota.com'
+$ftpUser = $env:SPARRING_FTP_USER
 $ftpHost = 'single-2030.banahosting.com'
 $publicBase = 'https://sparring.visitaremota.com'
 $marker = 'sparring-ftp-probe-' + [guid]::NewGuid().ToString('N') + '.txt'
@@ -60,6 +60,7 @@ finally {
   }
   Remove-Item -LiteralPath $temp -Force -ErrorAction SilentlyContinue
   Remove-Variable credential -ErrorAction SilentlyContinue
+  Remove-Item Env:SPARRING_FTP_USER -ErrorAction SilentlyContinue
   Remove-Item Env:SPARRING_FTP_PASS -ErrorAction SilentlyContinue
 }
 
