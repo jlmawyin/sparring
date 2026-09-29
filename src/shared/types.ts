@@ -5,7 +5,7 @@ export interface CriterionScore { id: CriterionId; label: string; weight: number
 export interface ScoreSnapshot { revision: number; criteria: CriterionScore[]; coverage: number; total: number | null; provisional: boolean; limitations: string[]; next_action: string; }
 export interface ScenarioBrief { id: string; version: string; title: string; brief: string; role: string; facts: Record<string, unknown>; authority: Record<string, unknown>; }
 export interface Catalog { scenarios: ScenarioBrief[]; criteria: { id: CriterionId; label: string; weight: number }[]; }
-export interface Health { status: string; key_configured: boolean; voice_enabled: boolean; mode: 'local'; }
+export interface Health { status: string; key_configured: boolean; voice_enabled: boolean; mode: 'local' | 'production'; }
 export interface StartRequest { scenario_id: string; scenario_version: string; consent: true; }
 export interface StartResponse { session_id: string; session_context: string; token: string; max_seconds: number; deadline: number; session_config: Record<string, unknown>; }
 export interface EvaluateRequest { session_context: string; revision: number; tool_call_id: string; tool_name: 'score_rubric' | 'log_objection'; arguments: Record<string, unknown>; transcript_final: Turn[]; }

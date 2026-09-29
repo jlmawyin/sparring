@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sparring - Practice the tough conversations</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #15394b;
+    background-color: #f4f8fa;
+    overflow: hidden;
+  }
+  .slides-container {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+  }
+  .slide {
+    height: 100vh;
+    width: 100vw;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10%;
+    position: relative;
+  }
+  .slide:nth-child(even) { background-color: #eaf2f5; }
+  .slide-number {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    font-size: 1.2rem;
+    color: #577382;
+  }
+  h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: #008b93;
+  }
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #15394b;
+  }
+  p, li {
+    font-size: 1.5rem;
+    line-height: 1.6;
+    color: #426171;
+    margin-bottom: 1rem;
+  }
+  ul { margin-left: 2rem; margin-bottom: 2rem; }
+  .tagline { font-size: 2rem; color: #577382; font-weight: 400; }
+  .highlight { color: #008b93; font-weight: bold; }
+  .evidence-box {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    border-left: 6px solid #008b93;
+    margin-top: 2rem;
+  }
+  .evidence-box p { margin: 0; font-size: 1.25rem; }
+  .truth-box {
+    background: #fff8ee;
+    border: 1px solid #e7c697;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    display: inline-block;
+  }
+  .truth-box p { color: #765022; font-size: 1.1rem; margin: 0; }
+  @page { size: 16in 9in; margin: 0; }
+  @media print {
+    body, .slides-container { width: 16in; height: auto; overflow: visible; }
+    .slide { width: 16in; height: 9in; break-after: page; page-break-after: always; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+  <div class="slides-container">
+
+    <!-- Slide 1: Problem & User -->
+    <div class="slide">
+      <h1>1. The Problem</h1>
+      <h2>Training for Tough Conversations is Hard</h2>
+      <p>Sales and support teams—especially small ones—face a difficult challenge:</p>
+      <ul>
+        <li>Role-playing with colleagues is awkward and doesn't scale.</li>
+        <li>Learning on the job with real customers risks relationships and revenue.</li>
+        <li>Generic scripts rarely reproduce the pressure and timing of a real voice call.</li>
+      </ul>
+      <p>They need a lightweight, accessible way to <span class="highlight">practice</span> difficult conversations before the real call.</p>
+      <div class="slide-number">1 / 6</div>
+    </div>
+
+    <!-- Slide 2: Product -->
+    <div class="slide">
+      <h1>2. The Product</h1>
+      <h2>Sparring: Practice by Voice</h2>
+      <p>Sparring is designed to provide short, repeatable voice practice with a simulated customer.</p>
+      <ul>
+        <li><strong>Select:</strong> Choose a difficult scenario (e.g., late delivery, price comparison, cancellation request).</li>
+        <li><strong>Practice:</strong> Talk to a simulated customer who challenges vague answers and raises realistic objections.</li>
+        <li><strong>Review:</strong> Understand the evidence behind your feedback.</li>
+        <li><strong>Repeat:</strong> Practice a better response to build confidence.</li>
+      </ul>
+      <div class="slide-number">2 / 6</div>
+    </div>
+
+    <!-- Slide 3: Demo -->
+    <div class="slide">
+      <h1>3. In Action</h1>
+      <h2>Demo Scenario: Late Delivery</h2>
+      <p>Example scenario: a customer asks for a 30% discount after a delayed order. The trainee has limited authority and must offer a policy-safe next step.</p>
+      <div class="evidence-box">
+        <p><strong>During the call:</strong> a tool proposes an observation, names the rubric criterion, and supplies an exact trainee quote. The server checks that evidence before updating the score.</p>
+      </div>
+      <p style="margin-top: 2rem;">The session ends with targeted coaching: one strength, one area for improvement, and an alternative response that stays within company policy.</p>
+      <div class="slide-number">3 / 6</div>
+    </div>
+
+    <!-- Slide 4: Technology -->
+    <div class="slide">
+      <h1>4. Technology</h1>
+      <h2>Built for Trust & Transparency</h2>
+      <ul>
+        <li><strong>Voice interaction:</strong> The browser connects to AssemblyAI's Voice Agent API using a short-lived server-issued token.</li>
+        <li><strong>Real-time Hooks:</strong> Function calls propose behavioral observations during the call.</li>
+        <li><strong>Deterministic Validation:</strong> Application logic strictly validates quoted evidence and calculates a transparent rubric.</li>
+      </ul>
+      <p><strong>Trust Boundaries:</strong> Scores are formative feedback, not professional certification. Our tool shows the exact coverage and limitations of every AI judgment.</p>
+      <div class="slide-number">4 / 6</div>
+    </div>
+
+    <!-- Slide 5: Value & Validation -->
+    <div class="slide">
+      <h1>5. Business Value</h1>
+      <h2>Practice Before the Real Call</h2>
+      <ul>
+        <li><strong>Buyer hypothesis:</strong> Small Spanish-speaking sales and support teams need repeatable practice without a complex rollout.</li>
+        <li><strong>Distinctive loop:</strong> Short voice role-play, evidence-backed feedback, and immediate retry.</li>
+        <li><strong>Pilot measure:</strong> Completion, perceived usefulness, and whether the next attempt improves one specific behavior.</li>
+      </ul>
+      <div class="truth-box">
+        <p>Automated tests use a mock provider. Human voice testing and team pilot results will be reported separately.</p>
+      </div>
+      <div class="slide-number">5 / 6</div>
+    </div>
+
+    <!-- Slide 6: Next Steps -->
+    <div class="slide">
+      <h1>6. Next Steps</h1>
+      <h2>Roadmap & Access</h2>
+      <ul>
+        <li><strong>Immediate Next Step:</strong> Human calibration testing and small-team pilots.</li>
+        <li><strong>Future:</strong> Team-specific scenarios, opt-in practice history, and measured coaching outcomes.</li>
+      </ul>
+      <div class="evidence-box" style="border-left-color: #008b93;">
+        <p><strong>Demo:</strong> <a href="https://sparring.visitaremota.com/" style="color:#008b93; text-decoration:none;">sparring.visitaremota.com</a></p>
+        <p style="margin-top:1rem;"><strong>Source Code:</strong> <a href="https://github.com/jlmawyin/sparring" style="color:#008b93; text-decoration:none;">github.com/jlmawyin/sparring</a></p>
+      </div>
+      <div class="slide-number">6 / 6</div>
+    </div>
+
+  </div>
+</body>
+</html>

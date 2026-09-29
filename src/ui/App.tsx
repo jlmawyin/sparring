@@ -1,6 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { createVoiceController } from '../voice/controller';
 import type { Catalog, CriterionScore, Health, ScoreSnapshot, Turn, VoiceController, VoiceState } from '../shared/types';
+import scenarioData from '../../spec/scenarios.json';
+import rubricData from '../../spec/rubric.json';
+
+const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const previewCatalog: Catalog = {
+  scenarios: scenarioData.map(scenario => ({
+    id: scenario.id, version: scenario.version, title: scenario.titulo,
+    brief: scenario.brief_visible, role: scenario.roles.usuario,
+    facts: scenario.hechos, authority: scenario.restricciones_autoridad,
+  })),
+  criteria: rubricData.criteria.map(({ id, label, weight }) => ({
+    id: id as Catalog['criteria'][number]['id'], label, weight,
+  })),
+};
 
 const titles: Record<string, string> = { late_delivery: 'Llegó tarde. El enojo, puntual.', price_objection: '“La competencia cobra menos.”', cancellation: 'Un cobro de más. Un cliente menos.' };
 const labels: Record<string, string> = { late_delivery: 'Entrega demorada', price_objection: 'Objeción de precio', cancellation: 'Solicitud de cancelación' };
@@ -36,7 +50,13 @@ export function App() {
     Promise.all([
       fetch('/api/catalog', { signal: ac.signal }).then(r => { if (!r.ok) throw Error(); return r.json() as Promise<Catalog>; }),
       fetch('/api/health', { signal: ac.signal }).then(r => { if (!r.ok) throw Error(); return r.json() as Promise<Health>; }),
-    ]).then(([c, h]) => { setCatalog(c); setHealth(h); }).catch(e => { if (e.name !== 'AbortError') setError('No se pudo conectar con el servicio local. Inicia npm run dev y vuelve a cargar.'); });
+    ]).then(([c, h]) => { setCatalog(c); setHealth(h); }).catch(e => {
+      if (e.name === 'AbortError') return;
+      setCatalog(previewCatalog);
+      setError(isLocal
+        ? 'No se pudo conectar con el servicio local. Inicia npm run dev y vuelve a cargar.'
+        : 'La práctica por voz no está disponible en este momento. Puedes explorar los escenarios y volver a intentarlo más tarde.');
+    });
     return () => ac.abort();
   }, []);
 
@@ -72,7 +92,7 @@ export function App() {
     <header className="masthead">
       <a className="brand" href="/" aria-label="Sparring, inicio"><span className="brand-symbol" aria-hidden="true">s</span> sparring<span className="brand-period">.</span></a>
       <span className="header-note">Entrena la conversación.</span>
-      <span className="environment"><span aria-hidden="true" />Laboratorio local</span>
+      <span className="environment"><span aria-hidden="true" />{isLocal ? 'Laboratorio local' : 'Práctica de voz'}</span>
     </header>
 
     <main>
@@ -81,7 +101,7 @@ export function App() {
         <p className="intro-note">Un cliente difícil. Tres minutos.<br/>Un siguiente paso para hacerlo mejor.</p>
       </section>
       {error && <div role="alert" className="notice error"><strong>Necesitamos tu atención.</strong> {error}</div>}
-      {health && (!health.key_configured || !health.voice_enabled) && <div className="notice" role="status">La voz está pendiente de configuración. Guarda tu clave de AssemblyAI en el archivo local <code>.env</code> y reinicia <code>npm run dev</code>. No pegues la clave en esta pantalla.</div>}
+      {health && (!health.key_configured || !health.voice_enabled) && <div className="notice" role="status">{isLocal ? <>La voz está pendiente de configuración. Guarda tu clave de AssemblyAI en el archivo local <code>.env</code> y reinicia <code>npm run dev</code>. No pegues la clave en esta pantalla.</> : 'La práctica por voz está temporalmente desactivada. Vuelve a intentarlo más tarde.'}</div>}
 
       <div className="practice-layout">
         <aside className="scenario-panel" aria-label="Escenarios de práctica">

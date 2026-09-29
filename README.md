@@ -1,10 +1,12 @@
 # Sparring
 
+[Read this README in English](README.en.md).
+
 Entrena conversaciones difíciles con un cliente simulado por voz. Tres escenarios ficticios, cinco criterios de evaluación, citas de evidencia y coaching al finalizar. Proyecto para AssemblyAI Voice Agent Hackathon, septiembre de 2026.
 
 ## Estado
 
-Primera integración local: React/TypeScript, audio del navegador, WebSocket directo a AssemblyAI y evaluación determinista en servidor. Las pruebas automatizadas simulan el proveedor: no sustituyen la llamada humana del gate G1. Estado y limitaciones vigentes en [HANDOFF](docs/HANDOFF.md).
+React/TypeScript, audio del navegador, WebSocket directo a AssemblyAI y evaluación determinista en servidor. La interfaz está publicada en [sparring.visitaremota.com](https://sparring.visitaremota.com/). El adaptador Node de producción está construido y probado localmente; su instalación en el hosting y la llamada humana del gate G1 siguen pendientes. Las pruebas automatizadas simulan AssemblyAI y no sustituyen una llamada real. Estado y limitaciones vigentes en [HANDOFF](docs/HANDOFF.md).
 
 ## Ejecutar localmente
 
@@ -24,7 +26,9 @@ npm run dev
 
 Abre http://127.0.0.1:5173 en Chrome o Edge, selecciona un caso, lee los límites, acepta el procesamiento de voz y permite el micrófono. Si modificas `.env` con el servicio iniciado, reinícialo. “Cortar audio” libera el micrófono. Cada práctica reserva hasta cuatro minutos del cupo local, incluidos feedback y márgenes.
 
-El servidor escucha sólo en loopback, puerto 8787. `SPARRING_MAX_SESSION_SECONDS` (60–240, por defecto 240) y `SPARRING_DAILY_MINUTES_CAP` (1–30, por defecto 30) acotan reserva, deadline y duración del token. El tope diario es **por proceso local** y se reinicia al reiniciar el servicio. No es el contador distribuido exigido para una demo pública. No publicar este adaptador ni exponer esos puertos a Internet; primero completar la cuota compartida y las pruebas de abuso del SDD.
+El adaptador **local** escucha sólo en loopback, puerto 8787. `SPARRING_MAX_SESSION_SECONDS` (60–240, por defecto 240) y `SPARRING_DAILY_MINUTES_CAP` (1–30, por defecto 30) acotan reserva, deadline y duración del token. Su contador es por proceso y se reinicia al reiniciar el servicio; no se publica este adaptador.
+
+El adaptador **de producción** sirve `dist/` y `/api` desde un mismo origen y persiste la cuota global en un archivo con reserva atómica; su empaquetado y configuración de cPanel están en [server/README.md](server/README.md). La clave sólo debe guardarse como variable de entorno del hosting, y el archivo de cuota debe estar fuera del document root. Hasta completar ese despliegue, la URL pública muestra los escenarios como vista previa con la voz deshabilitada.
 
 ## Verificar
 
@@ -46,6 +50,6 @@ Las pruebas no necesitan clave ni llaman a AssemblyAI. Playwright usa micrófono
 - [Reglas para agentes](AGENTS.md), [playbook reutilizable](ORCHESTRATOR-PLAYBOOK.md), [registro de orquestación](docs/ORCHESTRATION.md).
 - [Prompts de trabajo](docs/PROMPTS.md), [cliente](prompts/client-system.md), [coach](prompts/coach-system.md).
 
-No guardamos audio en esta aplicación. El proveedor procesa la voz según las condiciones de tu cuenta. La puntuación es formativa: verifica citas y cálculo, pero no certifica el juicio semántico de la IA ni protege frente a manipulación del navegador. Historial opt in, PWA, despliegue, calibración humana y entrega del hackathon son gates posteriores.
+No guardamos audio en esta aplicación. El proveedor procesa la voz según las condiciones de tu cuenta. La puntuación es formativa: verifica citas y cálculo, pero no certifica el juicio semántico de la IA ni protege frente a manipulación del navegador. Historial opt in, PWA, calibración humana y entrega del hackathon siguen pendientes.
 
 Código propio bajo [MIT](LICENSE). El starter oficial clonado en `.cache` se excluye del repositorio y no se copia: su licencia sigue pendiente de verificación.

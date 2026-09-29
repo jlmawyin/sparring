@@ -20,12 +20,12 @@ $ftpHost = 'single-2030.banahosting.com'
 $publicBase = 'https://sparring.visitaremota.com'
 $credential = $env:SPARRING_FTP_USER + ':' + $env:SPARRING_FTP_PASS
 $dist = Join-Path $root 'dist'
-$distRoot = (Get-Item -LiteralPath $dist).FullName
 
 Write-Output 'BUILD=START'
 npm run build | Out-Host
 if ($LASTEXITCODE -ne 0) { throw 'El build falló.' }
 
+$distRoot = (Get-Item -LiteralPath $dist).FullName
 $bundle = Get-ChildItem -LiteralPath $dist -Recurse -File
 if (-not $bundle) { throw 'dist está vacío.' }
 $textFiles = $bundle | Where-Object { $_.Extension -in @('.js', '.css', '.html', '.json', '.webmanifest') }
@@ -38,6 +38,9 @@ Write-Output ('BUNDLE_CHECK=PASS files=' + $bundle.Count)
 
 foreach ($file in $bundle) {
   $relative = $file.FullName.Substring($distRoot.Length).TrimStart('\', '/') -replace '\\', '/'
+  if (-not $relative -or $relative -match '(^/|^[A-Za-z]:|(^|/)\.\.(/|$))') {
+    throw ('Ruta remota inválida: ' + $relative)
+  }
   $url = 'ftp://' + $ftpHost + '/' + $relative
   $null = & curl.exe --ssl-reqd --ftp-create-dirs --max-time 180 -sS `
     -T $file.FullName $url --user $credential 2>&1

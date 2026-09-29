@@ -1,5 +1,16 @@
 # Relevo de Sparring
 
+## CHECKPOINT DE ENTREGA — 2026-09-29, tarde ECT
+
+- Objetivo de hoy: completar demo de voz, desplegar backend y dejar materiales listos antes del cierre oficial **30 sep 15:00 UTC / 10:00 ECT**. Fuente: página del evento lablab; la hora se confirmó en navegador y en el programa oficial.
+- Claude CLI implementó un adaptador Node de producción que sirve `dist/` y `/api` juntos, con cuota global persistente y reserva atómica en archivo. Codex ejecutó **typecheck PASS, 143/143 unitarias, build PASS, 8/8 E2E con proveedor simulado, validate:spec PASS**; luego añadió un rechazo de archivo de cuota dentro de `dist/` y verificó 15/15 pruebas focalizadas y typecheck. Un smoke test real del ejecutable Node sirvió `/`, `/api/catalog` y `/api/health` (modo producción, voz deshabilitada) con HTTP 200.
+- `scripts/package-node.ps1` genera `.cache/release/sparring-node.zip` con rutas ZIP de Linux y sin `.env`, `.secrets`, cuota ni `node_modules`; validación local `PACKAGE=PASS entries=31`. `app.js` es punto de entrada compatible con cPanel. **No se ha instalado aún en BanaHosting.** Requiere confirmar que cPanel ofrece Node, subir el ZIP a un application root privado, configurar las variables en el panel y probar HTTPS.
+- La interfaz pública todavía es estática. Se corrigió el estado de caída de `/api` para mostrar escenarios como vista previa y un mensaje público claro; esa nueva versión está construida localmente, **aún no subida por FTP**.
+- Agy produjo cover y slides editables; Codex corrigió URL/copy, exportó cover PNG 1920×1080 y PDF de seis páginas, y comprobó visualmente ambos y los enlaces del PDF. `submission-assets/form-copy.md` y `video-plan.md` preparan el formulario y la grabación. **El MP4 no existe todavía.**
+- Grok verificó el cierre y formatos con fuentes oficiales y advirtió que cPanel debe tener Node habilitado. El usuario confirmó disponibilidad para la prueba G1. Servidores locales activos en 5173/8787; health informó clave configurada y voz habilitada, pero **G1 LIVE_NOT_RUN** hasta recibir observación humana. La pestaña local quedó abierta en Edge.
+- Pendientes del usuario: confirmar la opción Node en cPanel; rotar la contraseña FTP expuesta por un diagnóstico detallado anterior y volver a guardarla en DPAPI. No usar FTP con la credencial antigua. La clave AssemblyAI nunca se imprime ni se pasa a agentes; su valor de producción debe introducirlo el usuario en la interfaz de hosting.
+- Próximo orden: (1) G1 humano y registro, (2) hosting Node o alternativa si no existe, (3) probar voz pública sin secretos, (4) grabar MP4 auténtico, (5) revisar README/claims/artefactos, (6) enviar formulario y conservar comprobante. No declarar DONE por tests mock.
+
 ## ACTUALIZACIÓN DE DESPLIEGUE — 2026-09-29 (corrección de ruta)
 
 - Se corrigió `scripts/deploy-ftps.ps1`: calcula la ruta relativa desde `dist` y publica sólo su contenido en la raíz FTP. La versión defectuosa había creado una carpeta remota `C:` con rutas locales.

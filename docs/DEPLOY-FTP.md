@@ -35,6 +35,8 @@ PUBLIC_URL=https://sparring.visitaremota.com
 
 La conexión debe usar FTPS explícito con `--ssl-reqd`, validar el certificado y no usar `--insecure`. El nombre `single-2030.banahosting.com` es el del certificado compartido del servidor; `ftp.mawyin.net` es el endpoint histórico de la cuenta.
 
+No ejecutar diagnósticos con `curl -v` cuando se pasa una contraseña: el registro detallado puede imprimirla. Si ocurre, rotar la clave en cPanel y reemplazar `SPARRING_FTP_PASS` en la bóveda local.
+
 La raíz de cada cuenta FTP puede ser distinta. Antes de publicar el build se debe subir un archivo de prueba con nombre único, comprobarlo por HTTPS y eliminarlo. No borrar `cgi-bin` ni `.well-known`.
 
 La prueba controlada se ejecuta así, después de guardar `SPARRING_FTP_USER` y `SPARRING_FTP_PASS`:

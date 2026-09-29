@@ -3,6 +3,8 @@
 !.env.example
 node_modules/
 dist/
+server-dist/
+/var/
 .cache/
 .agents-runtime/
 playwright-report/
@@ -11,3 +13,4 @@ output/playwright/
 *.log
 .codebase-memory/
 .secrets/
+submission-assets/slides-contact-sheet.png
