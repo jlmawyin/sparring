@@ -30,7 +30,7 @@ $bundle = Get-ChildItem -LiteralPath $dist -Recurse -File
 if (-not $bundle) { throw 'dist está vacío.' }
 $textFiles = $bundle | Where-Object { $_.Extension -in @('.js', '.css', '.html', '.json', '.webmanifest') }
 $joined = ($textFiles | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
-if ($joined -match 'ASSEMBLYAI_API_KEY|Bearer\s+[A-Za-z0-9._-]{12,}|127\.0\.0\.1|localhost:8787') {
+if ($joined -match 'ASSEMBLYAI_API_KEY|Bearer\s+[A-Za-z0-9._-]{12,}|https?://(?:127\.0\.0\.1|localhost)(?::\d+)?|localhost:8787') {
   throw 'El bundle contiene una clave, un token o una dirección local.'
 }
 if ($bundle | Where-Object { $_.Extension -eq '.map' }) { throw 'El bundle contiene mapas de código.' }
