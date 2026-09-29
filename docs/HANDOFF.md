@@ -1,5 +1,14 @@
 # Relevo de Sparring
 
+## ACTUALIZACIÓN DE DESPLIEGUE — 2026-09-29
+
+- Repositorio público: `https://github.com/jlmawyin/sparring`, rama `master`, último commit `5a80b7d`.
+- Se añadió manejo local de secretos con DPAPI en `scripts/secretos.ps1`; `.secrets/` está excluido de Git. No hay contraseñas en el repositorio.
+- BanaHosting FTPS autenticó correctamente contra `single-2030.banahosting.com:21`; un marcador apareció en la raíz FTP y fue eliminado.
+- `https://sparring.visitaremota.com` responde `404` para el marcador. La transferencia FTPS funciona, pero la raíz FTP todavía no está confirmada como docroot público del subdominio. No se publicó `dist/`.
+- El dominio correcto es `sparring.visitaremota.com`; `sparring.visitremota.com` no existe.
+- La contraseña histórica encontrada en `D:\Jorge\OneDrive\AI\DATA2026\docs\aicerebro-chrome.txt` no se reutiliza; rotar esa credencial antigua.
+
 ## CHECKPOINT VIGENTE — 2026-09-16 20:43 ECT
 
 **Orquestador principal: Codex. Revisión del relevo completada.** No recontar el chat ni repetir planificación. La siguiente dependencia sigue siendo G1 con voz humana; no hay que volver a insertar la clave ni repetir la auditoría ya cerrada.
