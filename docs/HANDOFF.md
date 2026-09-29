@@ -1,5 +1,14 @@
 # Relevo de Sparring
 
+## ACTUALIZACIÓN DE DESPLIEGUE — 2026-09-29 (corrección de ruta)
+
+- Se corrigió `scripts/deploy-ftps.ps1`: calcula la ruta relativa desde `dist` y publica sólo su contenido en la raíz FTP. La versión defectuosa había creado una carpeta remota `C:` con rutas locales.
+- Se eliminó la carpeta remota `C:` y sus directorios vacíos sin tocar `.well-known`, `cgi-bin`, `assets` ni los archivos correctos de la raíz.
+- Publicación verificada: build de 22 archivos, `BUNDLE_CHECK=PASS`, `FTPS_UPLOAD=PASS` y `https://sparring.visitaremota.com/` responde HTTP 200.
+- Prueba FTPS controlada verificada: subida, lectura HTTPS y borrado de marcadores `.txt` y `.html`, todos `PASS`; no quedaron marcadores.
+- El dominio correcto es `sparring.visitaremota.com`. La publicación actual es sólo el shell estático; el backend local (`/api`) todavía requiere un despliegue compatible separado antes de declarar la aplicación completa operativa.
+- Pendiente local: guardar también el usuario FTP en la bóveda DPAPI con `scripts/secretos.ps1 -Guardar SPARRING_FTP_USER`; la contraseña ya está guardada y ningún secreto se subió a Git.
+
 ## ACTUALIZACIÓN DE DESPLIEGUE — 2026-09-29
 
 - Repositorio público: `https://github.com/jlmawyin/sparring`, rama `master`, último commit `5a80b7d`.
