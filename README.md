@@ -26,7 +26,7 @@ npm run dev
 
 Abre http://127.0.0.1:5173 en Chrome o Edge, selecciona un caso, lee los límites, acepta el procesamiento de voz y permite el micrófono. Si modificas `.env` con el servicio iniciado, reinícialo. “Cortar audio” libera el micrófono. Cada práctica reserva hasta cuatro minutos del cupo local, incluidos feedback y márgenes.
 
-El adaptador **local** escucha sólo en loopback, puerto 8787. `SPARRING_MAX_SESSION_SECONDS` (60–240, por defecto 240) y `SPARRING_DAILY_MINUTES_CAP` (1–30, por defecto 30) acotan reserva, deadline y duración del token. Su contador es por proceso y se reinicia al reiniciar el servicio; no se publica este adaptador.
+El adaptador **local** escucha sólo en loopback, puerto 8787. `SPARRING_MAX_SESSION_SECONDS` (60–240, por defecto 240) y `SPARRING_DAILY_MINUTES_CAP` (1–60, por defecto 30) acotan reserva, deadline y duración del token. Su contador es por proceso y se reinicia al reiniciar el servicio; no se publica este adaptador. El despliegue de la entrega usa un límite explícito de 60 minutos reservados al día y conserva el consumo acumulado entre reinicios.
 
 La aplicación evalúa cada turno final del participante. Por defecto, `SPARRING_SCORING_MODE=local` aplica reglas conservadoras a señales explícitas de la transcripción, sin una llamada adicional al modelo; el servidor comprueba las citas literales y calcula la rúbrica. La modalidad opcional `gateway` usa una función forzada de [AssemblyAI LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/agentic-workflows), sólo para cuentas con acceso a sus modelos. Los `tool.call` espontáneos del Voice Agent siguen aceptándose. Las notas son formativas: las reglas pueden omitir una buena respuesta expresada de otra manera y ninguna modalidad certifica el desempeño.
 

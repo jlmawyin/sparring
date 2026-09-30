@@ -17,7 +17,7 @@ import type {
   VoiceController,
   VoiceState,
 } from '../shared/types';
-import { endSession, evaluate, finishSession, scoreTurn, startSession } from './api';
+import { ApiRequestError, endSession, evaluate, finishSession, scoreTurn, startSession } from './api';
 import { attemptEvaluate } from './evaluateRecovery';
 import { floatToPCM16, pcm16ToBase64 } from './pcm';
 import { PlaybackQueue, type PlaybackAudioContext } from './playback';
@@ -35,6 +35,19 @@ const STOP_CLOSE_TIMEOUT_MS = 2_000;
 const COACHING_BUDGET_MS = 40_000;
 const TOOL_EVAL_TIMEOUT_MS = 3_000;
 const QUOTE_WAIT_MS = 1_000;
+
+function startFailureMessage(error: unknown): string {
+  if (error instanceof ApiRequestError) {
+    switch (error.code) {
+      case 'daily_limit': return 'Se alcanzó el límite diario de minutos de práctica. La voz se habilitará al renovar el cupo.';
+      case 'session_active': return 'Hay otra práctica activa. Ciérrala o espera unos minutos y vuelve a intentar.';
+      case 'quota_unavailable': return 'No se pudo comprobar el cupo de voz. Intenta de nuevo más tarde.';
+      case 'voice_disabled': return 'La práctica por voz aún no está habilitada en este servidor.';
+      case 'voice_unavailable': return 'No se pudo preparar la voz. Intenta de nuevo más tarde.';
+    }
+  }
+  return 'No se pudo iniciar la sesión. Revisa la conexión e inténtalo de nuevo.';
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -640,9 +653,9 @@ export function createVoiceController(
         scenario_version: scenario.version,
         consent: true,
       });
-    } catch {
+    } catch (error) {
       if (myGeneration !== generation) return;
-      callbacks.onError('No se pudo iniciar la sesión.');
+      callbacks.onError(startFailureMessage(error));
       fullCleanup({ graceful: false });
       setState('error');
       return;

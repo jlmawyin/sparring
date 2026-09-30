@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createProductionApp, type ProductionAppOptions } from '../../server/productionApp.ts';
@@ -229,5 +229,33 @@ describe('production adapter: durable quota persistence and concurrency', () => 
   it('clamps SPARRING_MAX_SESSION_SECONDS and SPARRING_DAILY_MINUTES_CAP to documented bounds', async () => {
     const app = await fixture({ env: { SPARRING_MAX_SESSION_SECONDS: '999', SPARRING_DAILY_MINUTES_CAP: '100' } });
     expect((await app.start()).max_seconds).toBe(240);
+  });
+
+  it('honors a raised SPARRING_DAILY_MINUTES_CAP of 60 against an existing ledger without resetting it', async () => {
+    const quotaFile = makeQuotaFile();
+    writeFileSync(quotaFile, JSON.stringify({ day: '2026-09-30', reservedSeconds: 1680, activeContext: null, activeDeadline: null }));
+    const today = Date.UTC(2026, 8, 30, 12);
+    // 1680s (28 min) already reserved; a 240s (4 min) session pushes usage to 1920s (32 min),
+    // over the default 1800s (30 min) ceiling but within the raised 3600s (60 min) one.
+    const atDefault = await fixture({ quotaFile, now: () => today });
+    const blocked = await atDefault.request('/api/session/start', startBody);
+    expect(blocked.status).toBe(429);
+    expect(blocked.body.error).toBe('daily_limit');
+    expect(JSON.parse(readFileSync(quotaFile, 'utf8')).reservedSeconds).toBe(1680);
+
+    const atRaisedCap = await fixture({ quotaFile, now: () => today, env: { SPARRING_DAILY_MINUTES_CAP: '60' } });
+    const accepted = await atRaisedCap.request('/api/session/start', startBody);
+    expect(accepted.status).toBe(200);
+    expect(JSON.parse(readFileSync(quotaFile, 'utf8')).reservedSeconds).toBe(1920);
+  });
+
+  it('keeps the 60 minute ceiling even when configuration requests a larger budget', async () => {
+    const quotaFile = makeQuotaFile();
+    writeFileSync(quotaFile, JSON.stringify({ day: '2026-09-30', reservedSeconds: 3600, activeContext: null, activeDeadline: null }));
+    const app = await fixture({ quotaFile, now: () => Date.UTC(2026, 8, 30, 12), env: { SPARRING_DAILY_MINUTES_CAP: '100' } });
+    const rejected = await app.request('/api/session/start', startBody);
+    expect(rejected.status).toBe(429);
+    expect(rejected.body.error).toBe('daily_limit');
+    expect(JSON.parse(readFileSync(quotaFile, 'utf8')).reservedSeconds).toBe(3600);
   });
 });

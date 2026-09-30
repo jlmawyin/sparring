@@ -54,7 +54,7 @@ export function createApp(options: AppOptions = {}): Server {
   const enabled = env.SPARRING_VOICE_ENABLED === 'true';
   const scoringMode: ScoringMode = env.SPARRING_SCORING_MODE === 'gateway' ? 'gateway' : 'local';
   const sessionSeconds = boundedEnvInt(env.SPARRING_MAX_SESSION_SECONDS, 60, 240, DEFAULT_SESSION_SECONDS);
-  const dailySeconds = boundedEnvInt(env.SPARRING_DAILY_MINUTES_CAP, 1, 30, DEFAULT_DAILY_MINUTES) * 60;
+  const dailySeconds = boundedEnvInt(env.SPARRING_DAILY_MINUTES_CAP, 1, 60, DEFAULT_DAILY_MINUTES) * 60;
   const sessions = new Map<string, Session>();
   let active: string | null = null;
   let quotaDay = new Date(now()).toISOString().slice(0, 10);

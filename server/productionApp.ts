@@ -101,7 +101,7 @@ export function createProductionApp(options: ProductionAppOptions = {}): Server 
   const enabled = env.SPARRING_VOICE_ENABLED === 'true';
   const scoringMode: ScoringMode = env.SPARRING_SCORING_MODE === 'gateway' ? 'gateway' : 'local';
   const sessionSeconds = boundedEnvInt(env.SPARRING_MAX_SESSION_SECONDS, 60, 240, DEFAULT_SESSION_SECONDS);
-  const dailySeconds = boundedEnvInt(env.SPARRING_DAILY_MINUTES_CAP, 1, 30, DEFAULT_DAILY_MINUTES) * 60;
+  const dailySeconds = boundedEnvInt(env.SPARRING_DAILY_MINUTES_CAP, 1, 60, DEFAULT_DAILY_MINUTES) * 60;
   const staticDir = resolvePath(options.staticDir ?? env.SPARRING_STATIC_DIR ?? DEFAULT_STATIC_DIR);
   const quotaFile = resolvePath(options.quotaFile ?? env.SPARRING_QUOTA_FILE ?? DEFAULT_QUOTA_FILE);
   if (quotaFile === staticDir || quotaFile.startsWith(staticDir + sep)) {

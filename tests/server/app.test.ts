@@ -242,6 +242,18 @@ describe('local HTTP contract and token boundary', () => {
     expect((await app.start()).max_seconds).toBe(max_seconds);
   });
 
+  it('honors a SPARRING_DAILY_MINUTES_CAP of 60, above the former 30 minute maximum', async () => {
+    const app = await fixture({ env: { SPARRING_DAILY_MINUTES_CAP: '60' } });
+    for (let index = 0; index < 7; index++) {
+      const session = await app.start();
+      expect((await app.request('/api/session/end', { session_context: session.session_context })).body).toEqual({ ended: true });
+    }
+    // 7 * 240s = 1680s reserved; an 8th session brings it to 1920s, over the old 1800s (30 min) ceiling
+    // but within the new 3600s (60 min) one.
+    const eighth = await app.request('/api/session/start', startBody);
+    expect(eighth.status).toBe(200);
+  });
+
   it('times out even an injected fetch that ignores AbortSignal', async () => {
     let signal: AbortSignal | undefined;
     const upstream = vi.fn<typeof fetch>(async (_url, init) => {

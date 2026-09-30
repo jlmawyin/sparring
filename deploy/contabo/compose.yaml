@@ -17,7 +17,7 @@ services:
       SPARRING_SCORING_MODE: local
       SPARRING_VOICE_ENABLED: "true"
       SPARRING_MAX_SESSION_SECONDS: "240"
-      SPARRING_DAILY_MINUTES_CAP: "30"
+      SPARRING_DAILY_MINUTES_CAP: "60"
     networks:
       - net-core-services
     volumes:

@@ -10,6 +10,12 @@ import type {
   ScoreTurnResponse,
 } from '../shared/types';
 
+export class ApiRequestError extends Error {
+  constructor(readonly status: number, readonly code: string | undefined, message: string) {
+    super(message);
+  }
+}
+
 async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
   const res = await fetch(url, {
     method: 'POST',
@@ -19,13 +25,15 @@ async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Pr
   });
   if (!res.ok) {
     let message = `${url} failed with ${res.status}`;
+    let code: string | undefined;
     try {
       const data = await res.json();
       if (data && typeof data.message === 'string') message = data.message;
+      if (data && typeof data.error === 'string') code = data.error;
     } catch {
       // body wasn't JSON; keep default message.
     }
-    throw new Error(message);
+    throw new ApiRequestError(res.status, code, message);
   }
   return (await res.json()) as T;
 }
