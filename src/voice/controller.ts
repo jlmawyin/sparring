@@ -35,12 +35,6 @@ const STOP_CLOSE_TIMEOUT_MS = 2_000;
 const COACHING_BUDGET_MS = 40_000;
 const TOOL_EVAL_TIMEOUT_MS = 3_000;
 const QUOTE_WAIT_MS = 1_000;
-// Bounded grace after reply.done(completed) for a late tool.call before we
-// treat a finalized USER turn's reply as genuinely empty. Kept inside the
-// documented tool.call-around-reply.done window without stalling the UI.
-const REPLY_WATCHDOG_GRACE_MS = 1_000;
-const RECOVERY_REPLY_INSTRUCTIONS =
-  'Responde a la última intervención del vendedor como el cliente simulado, en español, de forma breve y directa. No repitas ni continúes frases interrumpidas, no uses herramientas ni inventes hechos nuevos.';
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -159,18 +153,6 @@ export function createVoiceController(
   const transcriptFinal: Turn[] = [];
   let turnCounter = 0;
   const agentDeltaBuffers = new Map<string, string>();
-  // turn_id of the latest finalized USER turn still awaiting its agent
-  // reply; cleared on transcript.agent, a new user turn, or teardown.
-  let awaitingUserTurnId: string | null = null;
-  // Whether a tool.call has been seen for the reply currently tracked
-  // (reset on each reply.started); a tool-only reply is valid silence.
-  let currentReplyToolCallSeen = false;
-  let currentReplyAudioSeen = false;
-  let inputSpeechActive = false;
-  let watchdogTimer: ReturnType<typeof setTimeout> | null = null;
-  // turn_ids for which a forced recovery reply.create has already been
-  // sent, so a second empty reply surfaces onError instead of retrying.
-  const recoveredTurns = new Set<string>();
   const pendingEvals = new Set<string>(); // call_ids with an in-flight /api/evaluate
   let queuedEvals = 0;
   const pendingGatewayScores = new Set<string>(); // turn_ids with an in-flight /api/session/score-turn
@@ -206,59 +188,6 @@ export function createVoiceController(
     if (globalDeadlineTimer) clearTimeout(globalDeadlineTimer);
     roleplayTimer = null;
     globalDeadlineTimer = null;
-    cancelWatchdog();
-  }
-
-  function cancelWatchdog(): void {
-    if (watchdogTimer) {
-      clearTimeout(watchdogTimer);
-      watchdogTimer = null;
-    }
-  }
-
-  /**
-   * Provider occasionally finishes a reply completed with no transcript.agent
-   * and no tool.call for a finalized USER turn (observed live 2026-09-30,
-   * ?voiceDebug=1 trace: reply.started -> reply.done(completed), nothing in
-   * between). Bounded recovery: wait a short grace for a late tool.call
-   * (tool.call events may legitimately arrive around reply.done per AAI's
-   * docs), then request exactly one replacement reply for that turn. If the
-   * forced reply is also empty, surface onError instead of retrying again.
-   */
-  function maybeArmWatchdog(replyId: string, myGeneration: number): void {
-    if (state !== 'roleplay') return; // never on greeting/coaching replies
-    if (!awaitingUserTurnId) return;
-    if (inputSpeechActive) return; // user has barged in; wait for that new finalized turn
-    if (currentReplyToolCallSeen) return; // valid tool-only reply
-    if (currentReplyAudioSeen) return; // audio arrived; the transcript may lag
-    if (!agentDeltaBuffers.has(replyId)) return; // transcript.agent already arrived
-
-    const turnId = awaitingUserTurnId;
-
-    if (recoveredTurns.has(turnId)) {
-      // This reply.done is the outcome of our own forced reply.create for
-      // turnId, and it is ALSO empty: bounded, no further retry.
-      recoveredTurns.delete(turnId);
-      awaitingUserTurnId = null;
-      callbacks.onError('El agente no respondió; finaliza manualmente si continúa.');
-      return;
-    }
-
-    watchdogTimer = setTimeout(() => {
-      watchdogTimer = null;
-      if (myGeneration !== generation) return;
-      if (state !== 'roleplay') return;
-      if (awaitingUserTurnId !== turnId) return;
-      if (inputSpeechActive) return;
-      if (currentReplyToolCallSeen) return;
-      if (currentReplyAudioSeen) return;
-      if (!agentDeltaBuffers.has(replyId)) return;
-      recoveredTurns.add(turnId);
-      if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('voiceDebug')) {
-        console.info('[sparring-voice] recovery reply.create sent for empty reply');
-      }
-      transport.sendReplyCreate(RECOVERY_REPLY_INSTRUCTIONS);
-    }, REPLY_WATCHDOG_GRACE_MS);
   }
 
   function stopCaptureGraph(): void {
@@ -490,19 +419,9 @@ export function createVoiceController(
         break;
       case 'input.speech.started':
         // A new user turn is beginning: any not-yet-sent tool result from
-        // the prior turn is now stale. The provider later confirms barge-in
-        // with reply.done(interrupted), but local playback must stop now.
+        // the prior turn is now stale (never audio-flushed here — the
+        // documented barge-in signal is reply.done status "interrupted").
         gate.onUserSpeechStarted();
-        // Stop local playback immediately when the seller takes the floor;
-        // waiting for reply.done(interrupted) can leave seconds of stale audio.
-        playback?.flush();
-        inputSpeechActive = true;
-        awaitingUserTurnId = null;
-        recoveredTurns.clear();
-        cancelWatchdog();
-        break;
-      case 'input.speech.stopped':
-        inputSpeechActive = false;
         break;
       case 'transcript.user.delta':
         callbacks.onPartial('USER', ev.text);
@@ -520,17 +439,11 @@ export function createVoiceController(
         transcriptFinal.push(turn);
         callbacks.onTurn(turn);
         triggerGatewayScore(turn, myGeneration);
-        inputSpeechActive = false;
-        awaitingUserTurnId = turn.turn_id;
-        cancelWatchdog();
         break;
       }
       case 'reply.started':
         gate.onReplyStarted(ev.reply_id);
         agentDeltaBuffers.set(ev.reply_id, '');
-        currentReplyToolCallSeen = false;
-        currentReplyAudioSeen = false;
-        cancelWatchdog();
         break;
       case 'transcript.agent.delta': {
         const prev = agentDeltaBuffers.get(ev.reply_id) ?? '';
@@ -553,13 +466,10 @@ export function createVoiceController(
         transcriptFinal.push(turn);
         callbacks.onTurn(turn);
         agentDeltaBuffers.delete(ev.reply_id);
-        cancelWatchdog();
-        awaitingUserTurnId = null;
         break;
       }
       case 'reply.audio':
         if (state === 'roleplay' || state === 'coaching') {
-          currentReplyAudioSeen = true;
           try { if (typeof ev.data === 'string') playback?.enqueueBase64(ev.data); }
           catch { callbacks.onError('Se descartó un fragmento de audio inválido.'); }
         }
@@ -568,16 +478,12 @@ export function createVoiceController(
         gate.onReplyDone(ev.reply_id, ev.status);
         if (ev.status === 'interrupted') {
           playback?.flush();
-          cancelWatchdog();
         } else {
           flushReadyToolResults();
-          maybeArmWatchdog(ev.reply_id, myGeneration);
         }
         if (state === 'coaching') onCoachReplyDone?.();
         break;
       case 'tool.call':
-        currentReplyToolCallSeen = true;
-        cancelWatchdog();
         enqueueToolCall(ev, myGeneration);
         break;
       case 'session.error':
@@ -705,12 +611,6 @@ export function createVoiceController(
     gate.reset();
     agentDeltaBuffers.clear();
     pendingEvals.clear();
-    awaitingUserTurnId = null;
-    currentReplyToolCallSeen = false;
-    currentReplyAudioSeen = false;
-    inputSpeechActive = false;
-    recoveredTurns.clear();
-    cancelWatchdog();
 
     setState('preparing');
     let localStream: MediaStream;
@@ -794,7 +694,6 @@ export function createVoiceController(
     if (state !== 'roleplay') return;
     const myGeneration = generation;
     setState('finalizing');
-    cancelWatchdog();
     if (roleplayTimer) clearTimeout(roleplayTimer);
     roleplayTimer = null;
 
