@@ -95,12 +95,13 @@ describe('local HTTP contract and token boundary', () => {
     expect(init?.headers).toMatchObject({ Authorization: `Bearer ${KEY}` });
     expect(init?.redirect).toBe('error');
     expect(started.session_config).toMatchObject({
-      input: { format: { encoding: 'audio/pcm' }, language_codes: ['es'] },
+      input: { format: { encoding: 'audio/pcm' }, language_codes: ['es'], transcription_mode: 'max_accuracy' },
       output: { voice: 'lola', format: { encoding: 'audio/pcm' } },
     });
     expect(started.session_config.agent_id).toBeUndefined();
     expect((started.session_config.tools as unknown[]).length).toBe(2);
     expect(started.session_config.system_prompt).not.toContain('{{');
+    expect(started.session_config.system_prompt as string).toContain('ORD-94821');
     expect(JSON.stringify(started)).not.toContain(KEY);
   });
 

@@ -56,10 +56,9 @@ export function sessionConfig(scenario: Scenario): Record<string, unknown> {
   // Verified against AssemblyAI events-reference: PCM16 mono 24 kHz is implicit.
   return {
     system_prompt: clientTemplate
-      .replace('{{SCENARIO_JSON}}', () => JSON.stringify(scenario))
-      .replace('{{RUBRIC_JSON}}', () => JSON.stringify(rubric)),
+      .replace('{{SCENARIO_JSON}}', () => JSON.stringify(scenario)),
     greeting: scenario.opening_line,
-    input: { format: { encoding: 'audio/pcm' }, language_codes: ['es'] },
+    input: { format: { encoding: 'audio/pcm' }, language_codes: ['es'], transcription_mode: 'max_accuracy' },
     output: { voice: 'lola', format: { encoding: 'audio/pcm' } },
     tools: toolDefinitions,
   };

@@ -79,7 +79,6 @@ for (const doc of docs) {
   }
 }
 assert.ok(read('prompts/client-system.md').includes('{{SCENARIO_JSON}}'));
-assert.ok(read('prompts/client-system.md').includes('{{RUBRIC_JSON}}'));
 assert.ok(read('prompts/coach-system.md').includes('{{SCORE_SNAPSHOT}}'));
 console.log(JSON.stringify({
   status: 'PASS',
