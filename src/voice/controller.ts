@@ -52,6 +52,23 @@ async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   }
 }
 
+// AssemblyAI documents transcript.agent.delta's `delta` field only as "the
+// next word (or token) of the agent's speech" — unlike transcript.user.delta
+// (explicitly "the full transcript so far"), it does not guarantee deltas
+// carry their own leading space. Naive `prev + delta` concatenation can then
+// glue words together in the live partial. The authoritative transcript.agent
+// (final) always arrives verbatim from the server and is never touched here.
+const NO_SPACE_BEFORE = /^[.,!?;:)\]}'’”…]/;
+function joinAgentDelta(prev: string, delta: string): string {
+  if (!prev || !delta) return prev + delta;
+  const prevEndsWithSpace = /\s$/.test(prev);
+  const deltaStartsWithSpace = /^\s/.test(delta);
+  if (prevEndsWithSpace || deltaStartsWithSpace || NO_SPACE_BEFORE.test(delta)) {
+    return prev + delta;
+  }
+  return `${prev} ${delta}`;
+}
+
 function resolveTurnId(
   turns: Turn[],
   role: 'USER' | 'AGENT',
@@ -423,7 +440,7 @@ export function createVoiceController(
         break;
       case 'transcript.agent.delta': {
         const prev = agentDeltaBuffers.get(ev.reply_id) ?? '';
-        const next = prev + ev.delta;
+        const next = joinAgentDelta(prev, ev.delta);
         agentDeltaBuffers.set(ev.reply_id, next);
         callbacks.onPartial('AGENT', next);
         break;

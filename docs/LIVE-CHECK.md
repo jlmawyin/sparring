@@ -1,4 +1,4 @@
-# Gate G1 — primera prueba real, no aprobada
+# Gate G1 — pruebas reales, puntuación aún no verificada
 
 La primera llamada con persona sí ocurrió; aún no acredita G1 porque no hubo puntuación en vivo. No subir API keys, tokens ni capturas del dashboard con credenciales.
 
@@ -23,3 +23,7 @@ La primera llamada con persona sí ocurrió; aún no acredita G1 porque no hubo 
 | Gate | **LIVE_FAILED_SCORING** — reparar, instrumentar y repetir la prueba antes de declarar G1 PASS. |
 
 Presupuesto de prueba propuesto: una llamada de hasta cuatro minutos; reserva local completa aunque se termine antes. El tope de 30 minutos es por proceso y no sobrevive reinicios. El coste real y la retención de datos deben comprobarse en la cuenta de AssemblyAI. Pruebas de latencia, otras plataformas y calibración humana completa siguen en TEST-PLAN.md.
+
+## Segunda prueba humana — sitio público
+
+Jorge probó `https://sparring.visitaremota.com/` antes del cierre del 29/30 de septiembre. Reportó que la interacción de voz fue convincente y que la aplicación dio consejos útiles, pero **la rúbrica no pudo asignar una nota numérica**. También observó que el texto del saludo aparece brevemente con palabras pegadas y que sólo el inicio del audio suena demasiado rápido; luego se normaliza. No registró porcentaje de cobertura, transcripción exacta, duración ni estado del micrófono. Por tanto, **G1 sigue parcial / sin aprobar en puntuación**. No atribuir automáticamente la falta de nota a un defecto: con cobertura menor al 60 % el diseño oculta la nota de forma deliberada. Hace falta repetir una interacción guiada y observar si aparecen evidencias y nota. Claude reprodujo en prueba sintética el defecto de separación de `transcript.agent.delta` y preparó un fix; todavía no acredita audio real ni despliegue. El ritmo inicial de síntesis aún no tiene causa verificada.

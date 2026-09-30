@@ -163,9 +163,9 @@ function scoreObjectionHandling(text: string): GatewayObservation | null {
 /** Any explicit percentage discount/refund grant, e.g. "le doy el 30%" / "de acuerdo, le hago un 15%". Captures the percentage in group 3. */
 const DISCOUNT_GRANT = /(le\s+(doy|ofrezco|otorgo|apruebo|autorizo|concedo)|de\s+acuerdo,?\s+le\s+(doy|hago)|acepto\s+(el|su|hacer))[\s\S]{0,40}(\d{1,3})\s?%/i;
 const FULL_OR_UNSPECIFIED_REFUND_GRANT = /reembolso\s+(completo|total|[ií]ntegro\s+del\s+monto|del\s+30)/i;
-const SHIPPING_REFUND = /reembolso[\s\S]{0,20}(env[ií]o|flete)/i;
+const SHIPPING_REFUND = /reembolso[\s\S]{0,30}(env[ií]o|flete)/i;
 const ESCALATION_ACTION = /(elevar|escalar)[\s\S]{0,30}(solicitud|caso)/i;
-const HOURS_4 = /4\s+horas\s+h[aá]biles/i;
+const HOURS_4 = /(4|cuatro)\s+horas\s+h[aá]biles/i;
 
 function scoreSolutionIntegrityLateDelivery(text: string): GatewayObservation | null {
   if (DISCOUNT_GRANT.test(text) || FULL_OR_UNSPECIFIED_REFUND_GRANT.test(text)) {
@@ -240,7 +240,7 @@ function scoreSolutionIntegrity(text: string, scenarioId: string | undefined): G
   }
 }
 
-const CLOSING_TIMEFRAME_OR_REFERENCE = /\d+\s+horas\s+h[aá]biles|dentro\s+de\s+(ese\s+)?plazo|n[uú]mero\s+de\s+referencia|caso\s+(SUP|REC)-?\d+/i;
+const CLOSING_TIMEFRAME_OR_REFERENCE = /(\d+|cuatro)\s+horas\s+h[aá]biles|dentro\s+de\s+(ese\s+)?plazo|n[uú]mero\s+de\s+referencia|(caso|referencia(\s+simulada)?)\s+(SUP|REC)-?\d+/i;
 const CLOSING_FOLLOWUP_ACTION = /le\s+dar[eé]\s+seguimiento|le\s+confirmar[eé]|quedamos\s+en\s+contacto|pr[oó]ximos\s+pasos/i;
 
 /** Level 3 requires BOTH a concrete timeframe/reference AND a follow-up action; either phrase alone (e.g. a bare "le daré seguimiento") is not level 3. */

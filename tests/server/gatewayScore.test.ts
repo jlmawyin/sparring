@@ -303,6 +303,59 @@ describe('scoreLatestTurn: local scorer applies exact per-scenario authority (sp
   });
 });
 
+describe('scoreLatestTurn: local scorer accepts natural voice phrasing for late_delivery authority', () => {
+  const fetchMock = vi.fn<typeof fetch>(async () => { throw new Error('must not call upstream'); });
+
+  it('rewards a shipping refund phrased with an intervening dollar amount ("reembolso de los 25 dólares del envío")', async () => {
+    const s = session();
+    const t = turn('Le ofrezco el reembolso de los 25 dólares del envío.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'solution_integrity')?.level).toBe(3);
+  });
+
+  it('rewards escalation phrased with the spelled-out "cuatro horas hábiles" (not just the digit)', async () => {
+    const s = session();
+    const t = turn('Voy a elevar su solicitud para una respuesta en cuatro horas hábiles.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'solution_integrity')?.level).toBe(3);
+  });
+
+  it('closing rewards a spelled-out timeframe plus a concrete simulated reference ("referencia simulada SUP-9482")', async () => {
+    const s = session();
+    const t = turn('Le daré seguimiento con la referencia simulada SUP-9482 y una respuesta en cuatro horas hábiles.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'closing')?.level).toBe(3);
+  });
+
+  it('does not reward a shipping refund padded far past the amount as an unrelated later refund mention', async () => {
+    const s = session();
+    const t = turn('El reembolso que procesamos ayer para otro pedido no aplica aquí; hoy solo puedo revisar el envío.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'solution_integrity')?.level ?? null).toBeNull();
+  });
+
+  it('still blocks an unauthorized full/integral refund even when phrased naturally, not the authorized shipping refund', async () => {
+    const s = session();
+    const t = turn('Le hago el reembolso íntegro del monto de su pedido, incluyendo el envío.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'solution_integrity')?.level).toBe(0);
+  });
+
+  it('still blocks an unauthorized 30% promise even alongside natural escalation phrasing', async () => {
+    const s = session();
+    const t = turn('Le doy el 30% de descuento y además elevo su solicitud en cuatro horas hábiles.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'solution_integrity')?.level).toBe(0);
+  });
+
+  it('closing: a bare reference-style word without a concrete case code is not level 3', async () => {
+    const s = session();
+    const t = turn('Le daré seguimiento con la referencia que anotamos.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'closing')?.level ?? null).toBeNull();
+  });
+});
+
 describe('scoreLatestTurn: local scorer closing requires a concrete timeframe/reference plus follow-up', () => {
   const fetchMock = vi.fn<typeof fetch>(async () => { throw new Error('must not call upstream'); });
 
