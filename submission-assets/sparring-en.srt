@@ -1,0 +1,242 @@
+1
+00:00:00,736 --> 00:00:04,422
+The order arrived two days late
+and paralyzed my team.
+
+2
+00:00:05,505 --> 00:00:07,898
+I want a 30% discount on the invoice.
+
+3
+00:00:10,240 --> 00:00:13,679
+This is Lola, she's furious and she's an AI.
+
+4
+00:00:14,836 --> 00:00:18,082
+Sparring lets salespeople and
+support agents rehearse
+
+5
+00:00:18,226 --> 00:00:21,312
+their toughest conversations out loud
+
+6
+00:00:21,884 --> 00:00:23,698
+before they happen for real.
+
+7
+00:00:25,952 --> 00:00:29,610
+It gives us the option to practice
+with a difficult customer
+
+8
+00:00:29,610 --> 00:00:32,016
+before handling a real one.
+
+9
+00:00:32,946 --> 00:00:34,291
+It helps you arrive better prepared.
+
+10
+00:00:35,053 --> 00:00:36,301
+Let's see an example.
+
+11
+00:00:39,326 --> 00:00:42,423
+We agree to send the audio to AssemblyAI
+
+12
+00:00:42,552 --> 00:00:44,681
+for this practice, and for Sparring to use
+
+13
+00:00:44,681 --> 00:00:47,763
+the transcript to assess the practice.
+Let's begin.
+
+14
+00:00:51,076 --> 00:00:53,810
+The order arrived two days late
+and paralyzed my team.
+
+15
+00:00:54,331 --> 00:00:56,576
+I want a 30% discount on the invoice.
+
+16
+00:00:58,232 --> 00:01:00,717
+I understand the impact of a 2-day delay
+
+17
+00:01:01,540 --> 00:01:04,074
+on your team's operations.
+I deeply regret the delay.
+
+18
+00:01:04,687 --> 00:01:08,117
+Before I propose a next step,
+what's most urgent for you today?
+
+19
+00:01:11,169 --> 00:01:13,547
+What's most urgent is recovering
+the money for the productivity
+
+20
+00:01:13,660 --> 00:01:15,807
+loss this caused us.
+
+21
+00:01:16,244 --> 00:01:19,603
+An apology means nothing to me
+if you don't cover the financial damage.
+
+22
+00:01:21,324 --> 00:01:22,402
+I understand your position.
+
+23
+00:01:22,836 --> 00:01:25,538
+Refunding shipping won't get back
+the hours you lost.
+
+24
+00:01:25,731 --> 00:01:29,801
+What I can offer right now
+is a refund of the $25 shipping fee.
+
+25
+00:01:30,350 --> 00:01:32,717
+I can also escalate the
+compensation request
+
+26
+00:01:32,782 --> 00:01:35,552
+so you get a response
+within 4 business hours.
+
+27
+00:01:36,084 --> 00:01:37,936
+It wouldn't be honest to promise you 30%.
+
+28
+00:01:38,113 --> 00:01:40,568
+Which of the steps I mentioned
+would help you most?
+
+29
+00:01:44,045 --> 00:01:46,645
+A shipping refund is a joke,
+
+30
+00:01:47,256 --> 00:01:49,871
+my workers lost hours
+of work because of you.
+
+31
+00:01:50,320 --> 00:01:53,080
+You are at fault and you have
+to cover the losses.
+
+32
+00:01:53,208 --> 00:01:57,443
+I demand to speak with someone who
+can decide, if you can't authorize the 30%.
+
+33
+00:01:57,860 --> 00:02:02,063
+I understand you're worried about
+waiting again with no news.
+
+34
+00:02:02,272 --> 00:02:06,587
+I'll escalate your request
+and follow up
+
+35
+00:02:06,587 --> 00:02:09,363
+using the simulated reference SUP 9482.
+
+36
+00:02:09,716 --> 00:02:11,528
+The response will arrive
+within 4 business hours.
+
+37
+00:02:11,657 --> 00:02:14,635
+Do you agree with that next step?
+Any other questions?
+
+38
+00:02:18,402 --> 00:02:22,639
+How do I know you won't leave me
+waiting another three days with no response?
+
+39
+00:02:22,995 --> 00:02:25,389
+I need assurance that this
+will be resolved today.
+
+40
+00:02:26,964 --> 00:02:31,934
+The process, unfortunately, is
+to escalate the request.
+
+41
+00:02:32,128 --> 00:02:38,008
+With the request number we have,
+you can expect
+
+42
+00:02:38,365 --> 00:02:42,952
+your response to be handled
+by someone who does have authorization.
+
+43
+00:02:45,250 --> 00:02:47,589
+Fine, I accept that you escalate it,
+
+44
+00:02:47,784 --> 00:02:49,977
+but you'd better really contact me
+within that
+
+45
+00:02:50,139 --> 00:02:52,787
+4-hour window — I won't waste
+more time on this.
+
+46
+00:02:54,856 --> 00:02:57,218
+Yes, it's the company's normal process.
+
+47
+00:02:57,989 --> 00:02:59,756
+If you have no other questions—
+
+48
+00:03:04,818 --> 00:03:08,248
+No more questions for now,
+but I'll be waiting for your follow-up.
+
+49
+00:03:09,288 --> 00:03:10,514
+Goodbye.
+
+50
+00:03:14,034 --> 00:03:18,050
+You scored 75 with
+100% coverage.
+
+51
+00:03:18,416 --> 00:03:20,133
+Your strength was handling...
+
+52
+00:03:23,843 --> 00:03:26,544
+And that's how Sparring works.
+
+53
+00:03:27,725 --> 00:03:31,558
+I hope you enjoyed the process.
+

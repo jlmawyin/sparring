@@ -16,13 +16,21 @@ Sales and support teams need a safe place to practice difficult conversations be
 
 - Demo: https://sparring.visitaremota.com/
 - Public repository: https://github.com/jlmawyin/sparring
-- Video: PENDING
+- Video (Spanish voice, English subtitles, 3:42): https://storage.googleapis.com/lablab-video-submissions/submissions/w1n7yq0n3mdwv80f5njsmhcp/owxjotv4oxbvrximwo2ink1z/video/video_fdqm9ywdy8ayah110dwn27zm.mp4
 - Slides: `submission-assets/slides.pdf`
 - Cover: `submission-assets/cover.png`
 
 ## Tags to choose if offered
 
 AssemblyAI, Voice Agents, Sales Training, Customer Support, EdTech
+
+## Application details saved in draft
+
+Platform: Other — Contabo VPS, Docker, Cloudflare HTTPS.
+
+Additional information:
+
+Hosted on a Contabo VPS using Docker, with HTTPS through Cloudflare. Open the demo in a microphone-enabled desktop browser, use headphones, choose Late delivery, and accept the voice consent before starting. The practice is in Spanish; the recorded video includes English subtitles. A session lasts up to four minutes including coaching and is subject to the public demo's daily usage cap. The recording shows a real conversation and its actual result: 75/100 with 100% rubric coverage. Sparring evaluates finalized trainee transcripts with deterministic rules and exact quote checks; the rubric is formative and does not assess vocal tone or certify performance. The next validation step is a pilot with small Spanish-speaking sales and support teams. The repository contains the MIT license, setup instructions, specification, tests, and known limitations.
 
 ## Release gate
 

@@ -118,7 +118,7 @@
       <h2>Demo Scenario: Late Delivery</h2>
       <p>Example scenario: a customer asks for a 30% discount after a delayed order. The trainee has limited authority and must offer a policy-safe next step.</p>
       <div class="evidence-box">
-        <p><strong>During the call:</strong> a tool proposes an observation, names the rubric criterion, and supplies an exact trainee quote. The server checks that evidence before updating the score.</p>
+        <p><strong>During the call:</strong> each finalized trainee response supplies evidence for the rubric. The server checks exact quotes and updates the observed criteria. A 0–100 score is shown only when at least 60% of the weighted rubric has been observed.</p>
       </div>
       <p style="margin-top: 2rem;">The session ends with targeted coaching: one strength, one area for improvement, and an alternative response that stays within company policy.</p>
       <div class="slide-number">3 / 6</div>
@@ -130,10 +130,10 @@
       <h2>Built for Trust & Transparency</h2>
       <ul>
         <li><strong>Voice interaction:</strong> The browser connects to AssemblyAI's Voice Agent API using a short-lived server-issued token.</li>
-        <li><strong>Real-time Hooks:</strong> Function calls propose behavioral observations during the call.</li>
-        <li><strong>Deterministic Validation:</strong> Application logic strictly validates quoted evidence and calculates a transparent rubric.</li>
+        <li><strong>Deterministic Turn Scoring:</strong> Every finalized trainee transcript is scored server-side against the rubric in real time, validating quoted evidence before updating criteria.</li>
+        <li><strong>Optional Tool Support:</strong> The Voice Agent can also call <code>log_objection</code> and <code>score_rubric</code> to propose observations directly; the server validates these the same way.</li>
       </ul>
-      <p><strong>Trust Boundaries:</strong> Scores are formative feedback, not professional certification. Our tool shows the exact coverage and limitations of every AI judgment.</p>
+      <p><strong>Limits:</strong> Scores are formative feedback, not certification. Coverage shows how much of the rubric was observed; unobserved criteria remain unscored.</p>
       <div class="slide-number">4 / 6</div>
     </div>
 
@@ -144,10 +144,11 @@
       <ul>
         <li><strong>Buyer hypothesis:</strong> Small Spanish-speaking sales and support teams need repeatable practice without a complex rollout.</li>
         <li><strong>Distinctive loop:</strong> Short voice role-play, evidence-backed feedback, and immediate retry.</li>
+        <li><strong>Business hypothesis:</strong> A team subscription with custom company scenarios; pricing and demand still need pilot validation.</li>
         <li><strong>Pilot measure:</strong> Completion, perceived usefulness, and whether the next attempt improves one specific behavior.</li>
       </ul>
       <div class="truth-box">
-        <p>Automated tests use a mock provider. Human voice testing and team pilot results will be reported separately.</p>
+        <p>The builder completed a live voice practice. Automated regression tests and live checks are documented separately. Team pilots are the next step.</p>
       </div>
       <div class="slide-number">5 / 6</div>
     </div>

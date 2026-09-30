@@ -14,3 +14,5 @@ output/playwright/
 .codebase-memory/
 .secrets/
 submission-assets/slides-contact-sheet.png
+/docs/sparring.mp4
+/submission-assets/*.mp4
