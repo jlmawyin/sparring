@@ -21,6 +21,11 @@
 - Edge mostró la llamada pública de Jorge en resultado: 01:39 en UI, saludo y **un** turno del usuario, cobertura 40 % (empatía 2/4, indagación 3/4), sin otros criterios; nota `— /100` por umbral 60 %. `docs/LIVE-CHECK.md` conserva el texto exacto y límites de esa observación. No inferir por qué terminó a 01:39. Se informó a Jorge que la segunda respuesta a la objeción debe ocurrir **antes** de pulsar terminar. G1 aún sin nota global.
 - La transcripción sí mencionaba “impacto ... en la operación de su equipo”, pero el patrón de empatía sólo toleraba 40 caracteres hasta el sustantivo. Claude amplió a 90 y Codex limitó la búsqueda a una sola oración para no tomar un sustantivo de otra frase. Pruebas específicas nuevas y negativas. Integración local tras cambio: **191/191 unitarias, build y 8/8 E2E simuladas PASS**. Cambio todavía local al escribir este bloque; commit/push/deploy pendientes.
 
+## CODEX — 2026-09-30 ~00:22 ECT (empatía publicada)
+
+- Commit `fcd775e` publicado en `origin/master`; prueba de empatía con frase real y control de frontera. Se copió **sólo** `server-dist/production.mjs` a `/root/sparring-app/server-dist/production.mjs` tras comparar SHA-256 local/remoto `759059f9cbbebc94cceb92491748e27bc0e2033dbfa97d10c0c6ed35785ee9c3`. Docker construyó imagen y recreó únicamente `sparring-app`; `running healthy` y `/api/health` público 200 con voz habilitada. No se tocó `.env`, proxy, DNS ni otros servicios.
+- Jorge recibió la explicación visible: primera intervención logró 40 % y la nota aparece con cobertura >=60 %; se le pidió responder al menos dos veces antes de terminar. Nueva prueba humana y video todavía pendientes. Los fixes de texto y scoring ya están publicados.
+
 ## CODEX — 2026-09-29 ~23:48 ECT
 
 - Jorge autorizó usar los créditos existentes para cerrar la entrega y pidió que Claude lidere la ejecución, con Grok/Agy según su criterio. Claude terminó el lote de captura, dejó `a00400c` publicado y entregó evidencia de medición en el bloque siguiente. No hay un proceso Claude activo al cerrar este lote.
