@@ -1,5 +1,12 @@
 # Relevo de Sparring
 
+## CODEX — 2026-09-29 ~23:48 ECT
+
+- Jorge autorizó usar los créditos existentes para cerrar la entrega y pidió que Claude lidere la ejecución, con Grok/Agy según su criterio. Claude terminó el lote de captura, dejó `a00400c` publicado y entregó evidencia de medición en el bloque siguiente. No hay un proceso Claude activo al cerrar este lote.
+- Codex corrigió el texto del formulario para distinguir las herramientas que el Voice Agent puede invocar del evaluador determinista que sí puntúa cada turno finalizado en producción. Commit `3d5d303` publicado en `origin/master`; árbol limpio. El texto está en `submission-assets/form-copy.md`.
+- G1 público humano sigue PENDIENTE: la pregunta ya se envió a Jorge. Esperar resultado de cobertura, nota provisional, feedback hablado y liberación de micrófono antes de declarar PASS, grabar la toma o cerrar el formulario. El intento local anterior fue `LIVE_FAILED_SCORING` antes de la corrección; 176 unitarias y 8 E2E son simuladas, no prueba pública.
+- Si G1 pasa, prueba de audio de 20 s según `submission-assets/recording-setup.md`, luego toma continua real y edición del MP4. Si falla, Claude recibe diagnóstico y corrección acotada; repetir pruebas pertinentes y desplegar sólo Sparring. Al terminar, preparar el formulario completo para visto bueno concreto de Jorge antes de envío final.
+
 ## ORQUESTADOR CLAUDE (Opus 5) — 2026-09-29 ~23:45 ECT
 
 - Jorge autorizó usar créditos y puso a Claude como relevo operativo mientras Codex espera su ventana (reset 2026-09-30 01:29:51 ECT). Grok/Agy quedan como agentes de Claude sólo si su capacidad aporta. No se canjean resets ni se compran créditos.
