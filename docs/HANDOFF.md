@@ -1,5 +1,12 @@
 # Relevo de Sparring
 
+## CODEX — 2026-09-30 ~00:25 ECT (materiales listos; espera de grabación)
+
+- Jorge confirmó que habilitó `Allow access to file URLs` para la extensión ChatGPT en Edge. El borrador lablab abrió normalmente: paso 1 persiste título, descripciones, categorías y etiqueta técnica `rest api`; paso 2 persiste portada y `slides.pdf`. El botón Next impide avanzar con mensaje `No video provided / Required`. No existe aún `%USERPROFILE%\\Videos\\Captures` ni un MP4 nuevo; por tanto **la próxima acción indispensable es la captura humana**.
+- Se detectó que el recorte inicial de lablab cortaba la `S` de Sparring. Se reeligió una copia idéntica del PNG original y se ajustó **sólo el recorte en el editor de lablab**, sin modificar la imagen fuente: ahora el título y la tarjeta de feedback aparecen completos. `Image upload successful` y, tras recargar la nueva versión de la página (3.72.1), imagen y PDF persistieron, progreso 58 %. El borrador sigue sin enviarse.
+- Estado técnico vigente: `origin/master` = `24204b1`, árbol limpio al cerrar el lote anterior; app pública `sparring-app` running healthy tras `fcd775e`, API health 200, sin cambios en otros servicios. La tercera prueba humana observada sólo llegó a 40 % con una respuesta; no hay nota global real. Los fixes de texto y scoring están publicados. Próximo paso: Jorge graba una toma real con Game Bar, hablando al menos dos veces antes de terminar; agente valida cobertura/nota y archivo MP4, edita video, lo sube y completa paso 3 del formulario.
+- Cupo Codex al abrir: 5 h 100 % usado, semanal 30 %, créditos existentes ~202,97; no canjear resets ni comprar. Sin despacho nuevo de agentes en este lote. Grok CLI 4.6 está instalado y autenticado históricamente, pero su cupo sigue DESCONOCIDO; no inventar porcentaje.
+
 ## CODEX — 2026-09-30 ~00:05 ECT (lote en curso)
 
 - Jorge hizo una segunda llamada humana en el sitio público: voz y coaching útiles, pero **sin nota numérica**; saludo parcial pegado y audio inicial muy rápido, luego normal. G1 sigue **parcial / puntuación no verificada**. `docs/LIVE-CHECK.md` ya registra el reporte sin inventar cobertura ni duración.
