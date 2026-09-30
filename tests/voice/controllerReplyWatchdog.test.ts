@@ -35,6 +35,8 @@ class FakeAudioWorkletNode {
   disconnect(): void {}
 }
 
+const playbackStop = vi.fn();
+
 function fakeAudioContext(): AudioContext {
   return {
     state: 'running',
@@ -43,8 +45,8 @@ function fakeAudioContext(): AudioContext {
     close: async () => {},
     createMediaStreamSource: () => ({ connect: () => {}, disconnect: () => {} }),
     createGain: () => ({ gain: { value: 0 }, connect: () => {} }),
-    createBuffer: () => ({ getChannelData: () => new Float32Array() }),
-    createBufferSource: () => ({ buffer: null, onended: null, connect: () => {}, start: () => {}, stop: () => {} }),
+    createBuffer: (_channels: number, length: number) => ({ getChannelData: () => new Float32Array(length) }),
+    createBufferSource: () => ({ buffer: null, onended: null, connect: () => {}, start: () => {}, stop: playbackStop }),
     currentTime: 0,
     sampleRate: 24000,
     destination: {},
@@ -133,6 +135,7 @@ function sendUserTurnThenEmptyReply(socket: FakeSocket, replyId: string): void {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  playbackStop.mockClear();
 });
 
 describe('voice controller reply-watchdog recovery for empty completed replies', () => {
@@ -217,6 +220,37 @@ describe('voice controller reply-watchdog recovery for empty completed replies',
     expect(sentMessages(socket).some((m) => m.type === 'reply.create')).toBe(false);
     expect(h.onError).not.toHaveBeenCalled();
 
+    h.controller.stop();
+  });
+
+  it('does not force a reply while the seller is barging in, but recovers the next finalized turn', async () => {
+    const { h, socket } = await beginRoleplayWithGreeting();
+    socket.message({ type: 'input.speech.started' });
+    socket.message({ type: 'transcript.user', item_id: 'item1', text: 'Entiendo el impacto.' });
+    socket.message({ type: 'input.speech.stopped' });
+    socket.message({ type: 'reply.started', reply_id: 'reply-old' });
+    socket.message({ type: 'input.speech.started' });
+    socket.message({ type: 'reply.done', reply_id: 'reply-old', status: 'completed' });
+    await wait(1200);
+    expect(sentMessages(socket).some((m) => m.type === 'reply.create')).toBe(false);
+
+    socket.message({ type: 'input.speech.stopped' });
+    socket.message({ type: 'transcript.user', item_id: 'item2', text: 'Puedo reembolsar el envío.' });
+    socket.message({ type: 'reply.started', reply_id: 'reply-new' });
+    socket.message({ type: 'reply.done', reply_id: 'reply-new', status: 'completed' });
+    await wait(1200);
+    expect(sentMessages(socket).filter((m) => m.type === 'reply.create')).toHaveLength(1);
+    h.controller.stop();
+  });
+
+  it('silences queued customer audio as soon as user speech starts', async () => {
+    const { h, socket } = await beginRoleplayWithGreeting();
+    socket.message({ type: 'reply.started', reply_id: 'reply-speaking' });
+    socket.message({ type: 'reply.audio', reply_id: 'reply-speaking', data: 'AAA=' });
+    expect(playbackStop).not.toHaveBeenCalled();
+
+    socket.message({ type: 'input.speech.started' });
+    expect(playbackStop).toHaveBeenCalledTimes(1);
     h.controller.stop();
   });
 

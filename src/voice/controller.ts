@@ -40,7 +40,7 @@ const QUOTE_WAIT_MS = 1_000;
 // documented tool.call-around-reply.done window without stalling the UI.
 const REPLY_WATCHDOG_GRACE_MS = 1_000;
 const RECOVERY_REPLY_INSTRUCTIONS =
-  'Responde ahora como el cliente simulado, en español, de forma breve y directa, sin usar herramientas ni inventar hechos nuevos.';
+  'Responde a la última intervención del vendedor como el cliente simulado, en español, de forma breve y directa. No repitas ni continúes frases interrumpidas, no uses herramientas ni inventes hechos nuevos.';
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -166,6 +166,7 @@ export function createVoiceController(
   // (reset on each reply.started); a tool-only reply is valid silence.
   let currentReplyToolCallSeen = false;
   let currentReplyAudioSeen = false;
+  let inputSpeechActive = false;
   let watchdogTimer: ReturnType<typeof setTimeout> | null = null;
   // turn_ids for which a forced recovery reply.create has already been
   // sent, so a second empty reply surfaces onError instead of retrying.
@@ -227,6 +228,7 @@ export function createVoiceController(
   function maybeArmWatchdog(replyId: string, myGeneration: number): void {
     if (state !== 'roleplay') return; // never on greeting/coaching replies
     if (!awaitingUserTurnId) return;
+    if (inputSpeechActive) return; // user has barged in; wait for that new finalized turn
     if (currentReplyToolCallSeen) return; // valid tool-only reply
     if (currentReplyAudioSeen) return; // audio arrived; the transcript may lag
     if (!agentDeltaBuffers.has(replyId)) return; // transcript.agent already arrived
@@ -247,6 +249,7 @@ export function createVoiceController(
       if (myGeneration !== generation) return;
       if (state !== 'roleplay') return;
       if (awaitingUserTurnId !== turnId) return;
+      if (inputSpeechActive) return;
       if (currentReplyToolCallSeen) return;
       if (currentReplyAudioSeen) return;
       if (!agentDeltaBuffers.has(replyId)) return;
@@ -487,10 +490,19 @@ export function createVoiceController(
         break;
       case 'input.speech.started':
         // A new user turn is beginning: any not-yet-sent tool result from
-        // the prior turn is now stale (never audio-flushed here — the
-        // documented barge-in signal is reply.done status "interrupted").
+        // the prior turn is now stale. The provider later confirms barge-in
+        // with reply.done(interrupted), but local playback must stop now.
         gate.onUserSpeechStarted();
+        // Stop local playback immediately when the seller takes the floor;
+        // waiting for reply.done(interrupted) can leave seconds of stale audio.
+        playback?.flush();
+        inputSpeechActive = true;
+        awaitingUserTurnId = null;
+        recoveredTurns.clear();
         cancelWatchdog();
+        break;
+      case 'input.speech.stopped':
+        inputSpeechActive = false;
         break;
       case 'transcript.user.delta':
         callbacks.onPartial('USER', ev.text);
@@ -508,6 +520,7 @@ export function createVoiceController(
         transcriptFinal.push(turn);
         callbacks.onTurn(turn);
         triggerGatewayScore(turn, myGeneration);
+        inputSpeechActive = false;
         awaitingUserTurnId = turn.turn_id;
         cancelWatchdog();
         break;
@@ -695,6 +708,7 @@ export function createVoiceController(
     awaitingUserTurnId = null;
     currentReplyToolCallSeen = false;
     currentReplyAudioSeen = false;
+    inputSpeechActive = false;
     recoveredTurns.clear();
     cancelWatchdog();
 
