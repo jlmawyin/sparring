@@ -7,7 +7,8 @@
 - Git inspeccionado: `.env` ignorado y no tracked; `git diff --check` sin errores; sin claves, tokens ni `.secrets/` en el árbol a publicar. No se tocó Docker, Nginx, Cloudflare ni otros contenedores/vhosts.
 - Este commit publica lo ya verificado en MOCK: puntuación local por turno finalizado, Gateway opcional, serialización score-turn/`tool.call`, artefactos Contabo (`.dockerignore`, `deploy/contabo/`) y docs de estado. Evidencia previa (Claude 176/176 unitarias y typecheck; Codex `build`, `validate:spec`, 8/8 E2E) **no acredita G1**.
 - **G1 público sigue pendiente de Jorge.** No marcar PASS. Video MP4 y envío lablab pendientes; no presentar submission sin instrucción específica.
-- `origin/master` era `f579797`. Tras el push, usar `git log -1 --oneline` como HEAD público.
+- GitHub `origin/master` = `6a445ae` (`Add local in-call scoring and Contabo deploy artifacts`). 22 archivos; `.env` no publicado. Working tree limpio tras el push.
+- Siguiente paso humano, no de agentes: Jorge prueba G1 en `https://sparring.visitaremota.com/` (consentimiento → iniciar → responder al reclamo) y reporta cobertura, nota o error. No diagnosticar ni redeployar hasta ese reporte. No tocar otros servicios.
 
 ## RELEVO POR CUPO — 2026-09-29 ~23:15 ECT
 
