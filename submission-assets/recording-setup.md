@@ -82,7 +82,7 @@ Límite heredado: la región es 1280×720 porque a 1080p `gdigrab` cae a 5 fps. 
 
 ## Toma buena
 
-- **Una toma continua** de la práctica completa, sin pausar. Ahí queda la evidencia de las tool calls y de la cobertura subiendo en vivo.
+- **Una toma continua** de la práctica completa, sin pausar. Ahí queda la evidencia de la conversación y de la cobertura subiendo en vivo.
 - Duración de la llamada: 2–3 min (el tope de sesión del servidor es 240 s).
 - Lo que la toma debe contener, con las etiquetas reales de la UI:
   - Panel **Escenarios de práctica** y selección de *Entrega demorada*.

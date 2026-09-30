@@ -1,5 +1,11 @@
 # Gate G1 — nota real verificada; continuidad pendiente
 
+## Quinta prueba pública — duplicación y reversión (2026-09-30 ~06:05 ECT)
+
+En la versión `46a7b2c`, Jorge terminó una llamada de 01:46. La UI mostró **67/100 con 65 % de cobertura**, pero repitió literalmente la objeción «Un reembolso de envío es una burla, mis operarios perdieron horas de trabajo por su culpa.» dos veces y apareció `El agente no respondió; finaliza manualmente si continúa.`. La traza optativa en Edge incluye un reply vacío, luego `recovery reply.create sent`, varios replies y dos `transcript.agent` consecutivos; no se capturaron IDs/timing exactos. Por tanto, la puntuación real está confirmada, **la continuidad G1 no**.
+
+Se retiró el watchdog/reintento del cliente y se desplegó `1d40226` (asset `index-BinPc2yX.js`; salud pública 200; Docker sano). Tests 196/196 y build PASS. Este rollback evita que Sparring envíe un `reply.create` adicional durante roleplay; queda por comprobar una nueva toma real sin duplicación. Si la respuesta automática vuelve a quedar vacía, no ocultar la limitación ni reactivar el reintento sin una prueba discriminante.
+
 ## Prueba pública 2026-09-30 ~01:30 ECT, versión `03ebc38`
 
 La recuperación sí produjo una réplica después de un reply vacío, pero la llamada resultó peor para Jorge: el cliente se cortó y reanudó, el usuario trató de hablar y la interacción perdió continuidad. En Edge se observaron `input.speech.started` durante una respuesta del agente, luego `reply.done completed` y `recovery reply.create sent` **antes** de `input.speech.stopped`. Tras 03:15, el coaching indicó evaluación incompleta y la UI mostró 20 % de cobertura y `—/100`. No usar esta toma como evidencia positiva.

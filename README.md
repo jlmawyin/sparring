@@ -6,7 +6,7 @@ Entrena conversaciones difíciles con un cliente simulado por voz. Tres escenari
 
 ## Estado
 
-React/TypeScript, audio del navegador, WebSocket directo a AssemblyAI y evaluación determinista en servidor. La [demo pública](https://sparring.visitaremota.com/) ya sirve frontend y API desde Contabo; `/api/health` confirmó voz habilitada. Una primera llamada humana local confirmó la conversación, pero no generó puntuación; la ruta de evaluación fue corregida y aún falta repetir la prueba humana en producción. Las pruebas automatizadas simulan AssemblyAI y no sustituyen esa llamada. Estado y limitaciones vigentes en [HANDOFF](docs/HANDOFF.md).
+React/TypeScript, audio del navegador, WebSocket directo a AssemblyAI y evaluación determinista en servidor. La [demo pública](https://sparring.visitaremota.com/) sirve frontend y API desde Contabo. Una llamada humana pública mostró una nota real de **67/100 con 65 % de cobertura**. La continuidad de la voz sigue siendo experimental: algunas respuestas automáticas del proveedor han terminado vacías; se retiró un reintento del cliente que duplicaba la voz. Las pruebas automatizadas simulan AssemblyAI y no prueban que cada llamada real continúe sin interrupciones. Estado y limitaciones vigentes en [HANDOFF](docs/HANDOFF.md).
 
 ## Ejecutar localmente
 

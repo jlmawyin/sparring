@@ -1,8 +1,8 @@
 # Sparring
 
-Sparring helps sales and support teams rehearse difficult customer conversations by voice. A simulated customer raises objections; application-triggered in-call scoring proposes observations; the server checks exact quotes and computes a transparent, weighted rubric. The trainee ends with focused coaching and can practice again.
+Sparring helps sales and support teams rehearse difficult customer conversations by voice. A simulated customer raises objections; the application scores each finalized trainee turn, checks exact quotes, and computes a transparent, weighted rubric. The trainee ends with focused coaching and can practice again.
 
-Built for the [AssemblyAI Voice Agent Hackathon](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon). Try the [public demo](https://sparring.visitaremota.com/). The public frontend and voice API are live on Contabo; a second human call is still needed to verify in-call scoring. The first local human call confirmed the conversation but produced no score. Automated tests use a mocked AssemblyAI provider and do not prove live scoring.
+Built for the [AssemblyAI Voice Agent Hackathon](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon). Try the [public demo](https://sparring.visitaremota.com/). The public frontend and voice API are live on Contabo. A real public call produced **67/100 with 65% rubric coverage**. Voice continuity remains experimental: some automatic provider replies have completed without speech. A client retry that caused duplicate speech was removed. Automated tests use a mocked AssemblyAI provider and cannot prove uninterrupted live calls.
 
 ## What is implemented
 
