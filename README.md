@@ -6,7 +6,7 @@ Entrena conversaciones difíciles con un cliente simulado por voz. Tres escenari
 
 ## Estado
 
-React/TypeScript, audio del navegador, WebSocket directo a AssemblyAI y evaluación determinista en servidor. La interfaz está publicada en [sparring.visitaremota.com](https://sparring.visitaremota.com/). El adaptador Node de producción está construido y probado localmente; su instalación en el hosting y la llamada humana del gate G1 siguen pendientes. Las pruebas automatizadas simulan AssemblyAI y no sustituyen una llamada real. Estado y limitaciones vigentes en [HANDOFF](docs/HANDOFF.md).
+React/TypeScript, audio del navegador, WebSocket directo a AssemblyAI y evaluación determinista en servidor. La [demo pública](https://sparring.visitaremota.com/) ya sirve frontend y API desde Contabo; `/api/health` confirmó voz habilitada. Una primera llamada humana local confirmó la conversación, pero no generó puntuación; la ruta de evaluación fue corregida y aún falta repetir la prueba humana en producción. Las pruebas automatizadas simulan AssemblyAI y no sustituyen esa llamada. Estado y limitaciones vigentes en [HANDOFF](docs/HANDOFF.md).
 
 ## Ejecutar localmente
 
@@ -28,7 +28,9 @@ Abre http://127.0.0.1:5173 en Chrome o Edge, selecciona un caso, lee los límite
 
 El adaptador **local** escucha sólo en loopback, puerto 8787. `SPARRING_MAX_SESSION_SECONDS` (60–240, por defecto 240) y `SPARRING_DAILY_MINUTES_CAP` (1–30, por defecto 30) acotan reserva, deadline y duración del token. Su contador es por proceso y se reinicia al reiniciar el servicio; no se publica este adaptador.
 
-El adaptador **de producción** sirve `dist/` y `/api` desde un mismo origen y persiste la cuota global en un archivo con reserva atómica; su empaquetado y configuración de cPanel están en [server/README.md](server/README.md). La clave sólo debe guardarse como variable de entorno del hosting, y el archivo de cuota debe estar fuera del document root. Hasta completar ese despliegue, la URL pública muestra los escenarios como vista previa con la voz deshabilitada.
+La aplicación evalúa cada turno final del participante. Por defecto, `SPARRING_SCORING_MODE=local` aplica reglas conservadoras a señales explícitas de la transcripción, sin una llamada adicional al modelo; el servidor comprueba las citas literales y calcula la rúbrica. La modalidad opcional `gateway` usa una función forzada de [AssemblyAI LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/agentic-workflows), sólo para cuentas con acceso a sus modelos. Los `tool.call` espontáneos del Voice Agent siguen aceptándose. Las notas son formativas: las reglas pueden omitir una buena respuesta expresada de otra manera y ninguna modalidad certifica el desempeño.
+
+El adaptador **de producción** sirve `dist/` y `/api` desde un mismo origen y persiste la cuota global en un archivo con reserva atómica; su configuración está en [server/README.md](server/README.md). El despliegue usa un contenedor Docker en Contabo detrás de Nginx y Cloudflare, con `.env` privado fuera de la imagen y de Git. El archivo de cuota se guarda en un volumen persistente.
 
 ## Verificar
 

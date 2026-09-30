@@ -6,9 +6,11 @@ Los contextos opacos de 256 bits, la transcripción aceptada, las respuestas ide
 
 La evaluación valida estructura y anclaje literal, y calcula pesos desde `spec/rubric.json`; no valida la corrección semántica del nivel propuesto ni autentica una transcripción enviada por el navegador. Toda llamada nueva aceptada incrementa la revisión; la primera espera revisión 0. Un rechazo no cambia score, revisión ni transcripción. `finish` congela el score sin liberar la sesión mientras se reproduce coaching; `end` libera la sesión y conserva la reserva.
 
+`POST /api/session/score-turn` recibe un turno `USER` finalizado y la transcripción acumulada. Por defecto, `SPARRING_SCORING_MODE=local` extrae señales textuales explícitas con reglas deterministas en el servidor, sin llamada al Gateway. `SPARRING_SCORING_MODE=gateway` habilita la función forzada `score_rubric_observation` de [AssemblyAI LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/agentic-workflows) sólo cuando la cuenta tiene acceso al modelo; la clave promocional de este proyecto recibió HTTP 400 al probar dos modelos. La cita se toma literalmente del turno enviado (máximo 500 caracteres, con ocurrencia calculada en servidor). Las solicitudes por sesión se aplican en orden, se deduplican por `turn_id` y tienen un máximo de 40 turnos. El Gateway, si se habilita, vence a los 6 segundos; un fallo no crea puntuación ficticia. El navegador envía transcripciones: este MVP no autentica el audio, y las reglas locales pueden omitir conductas válidas expresadas de otra manera. El flujo previo de `tool.call` del Voice Agent sigue disponible.
+
 Protocolo de configuración comprobado en [AssemblyAI events reference](https://www.assemblyai.com/docs/voice-agents/voice-agent-api/events-reference): formato `audio/pcm`, PCM16 mono 24 kHz, voz `lola`, español y configuración inline. Las pruebas inyectan proveedor ficticio y no demuestran conversación real.
 
-## Adaptador de producción (cPanel/Passenger o host Node equivalente)
+## Adaptador de producción (Docker en Contabo o host Node equivalente)
 
 `productionApp.ts` (`createProductionApp`) sirve el frontend construido (`dist/`) y `/api` desde el mismo origen y puerto — no hay CORS ni lista de orígenes porque no existe un origen cruzado legítimo. `production.ts` es el punto de entrada ejecutable: escucha en `process.env.PORT` (lo fija Passenger) o `SPARRING_PORT` (por defecto 8788), en el host `SPARRING_HOST` (por defecto `0.0.0.0`).
 
@@ -24,6 +26,12 @@ npm start       # node server-dist/production.mjs
 ```
 
 `build:server` empaqueta `server/production.ts` con esbuild (`--bundle --platform=node --format=esm`) en un único archivo `server-dist/production.mjs` sin dependencias de terceros en tiempo de ejecución (el servidor sólo usa módulos `node:*` y los propios `spec/`, `prompts/` leídos por ruta relativa en tiempo de ejecución). `server-dist/` debe quedar como hermano de `dist/`, `spec/` y `prompts/` en la raíz del proyecto para que esas rutas relativas se resuelvan igual que en desarrollo.
+
+### Publicar en Contabo con Docker
+
+Los archivos de `deploy/contabo/` definen un contenedor Node sin puerto de host, conectado únicamente a la red Docker externa `net-core-services`. `sparring.conf` es un vhost exclusivo de `sparring.visitaremota.com` en el proxy Nginx ya existente. El contexto de compilación acepta sólo `app.js`, `package.json`, `server-dist/`, `dist/`, `spec/` y `prompts/`; `.env` queda fuera de la imagen y de Git. El archivo privado `/root/sparring-app/.env` requiere permisos `600`, mientras `/root/sparring-app/var` persiste la cuota y pertenece al UID 1000 del contenedor. El Compose fija `SPARRING_SCORING_MODE=local` para no depender del acceso opcional a LLM Gateway.
+
+Antes de dirigir el DNS, comprobar `docker compose ... config -q`, construir sólo el servicio `sparring`, esperar su estado `healthy`, consultar `/api/health` desde `web-proxy-core`, validar `nginx -t` y entonces recargar el proxy. En el despliegue del 30 de septiembre estas comprobaciones pasaron; HTTPS público sirvió `/` y `/api/health` con `voice_enabled=true`. Esto verifica infraestructura, no una llamada humana real ni el resultado de la rúbrica.
 
 ### Publicar en cPanel (Node Selector / Passenger)
 

@@ -17,7 +17,7 @@ import type {
   VoiceController,
   VoiceState,
 } from '../shared/types';
-import { endSession, evaluate, finishSession, startSession } from './api';
+import { endSession, evaluate, finishSession, scoreTurn, startSession } from './api';
 import { attemptEvaluate } from './evaluateRecovery';
 import { floatToPCM16, pcm16ToBase64 } from './pcm';
 import { PlaybackQueue, type PlaybackAudioContext } from './playback';
@@ -138,8 +138,9 @@ export function createVoiceController(
   const agentDeltaBuffers = new Map<string, string>();
   const pendingEvals = new Set<string>(); // call_ids with an in-flight /api/evaluate
   let queuedEvals = 0;
+  const pendingGatewayScores = new Set<string>(); // turn_ids with an in-flight /api/session/score-turn
   const seenProviderItems = new Set<string>();
-  let evalQueue: Promise<void> = Promise.resolve(); // serializes tool.call processing
+  let evalQueue: Promise<void> = Promise.resolve(); // serializes both scoring paths against one revision
 
   let onSessionUpdated: (() => void) | null = null;
   let onCoachReplyDone: (() => void) | null = null;
@@ -216,6 +217,7 @@ export function createVoiceController(
     gate.reset();
     agentDeltaBuffers.clear();
     pendingEvals.clear();
+    pendingGatewayScores.clear();
     onSessionUpdated = null;
     onCoachReplyDone = null;
   }
@@ -338,6 +340,37 @@ export function createVoiceController(
     flushReadyToolResults();
   }
 
+  /**
+   * Queues application-triggered scoring for a finalized USER turn. The
+   * selected scorer runs locally by default or through Gateway when enabled.
+   * Sharing evalQueue with Voice Agent tool.call handling prevents both paths
+   * from submitting the same stale revision. Audio remains non-blocking;
+   * finish() drains pendingGatewayScores before closing the session.
+   */
+  function triggerGatewayScore(turn: Turn, myGeneration: number): void {
+    if (!sessionContext) return;
+    const ctx = sessionContext;
+    pendingGatewayScores.add(turn.turn_id);
+    const transcript = transcriptFinal.slice();
+    const run = async (): Promise<void> => {
+      if (myGeneration !== generation) return;
+      try {
+        const result = await scoreTurn({ session_context: ctx, turn_id: turn.turn_id, transcript_final: transcript });
+        if (myGeneration !== generation) return;
+        if (result.snapshot && !scoreFrozen && result.snapshot.revision > revision) {
+          revision = result.snapshot.revision;
+          callbacks.onSnapshot(result.snapshot);
+        }
+      } catch {
+        // Best-effort formative path; the existing tool.call path and the
+        // next finalized turn's attempt remain the coverage backstop.
+      } finally {
+        if (myGeneration === generation) pendingGatewayScores.delete(turn.turn_id);
+      }
+    };
+    evalQueue = evalQueue.then(run, run);
+  }
+
   /** Serialize tool.call processing so revision tracking stays correct. */
   function enqueueToolCall(ev: Extract<ServerEvent, { type: 'tool.call' }>, myGeneration: number): void {
     if (toolCallsClosed()) return;
@@ -381,6 +414,7 @@ export function createVoiceController(
         };
         transcriptFinal.push(turn);
         callbacks.onTurn(turn);
+        triggerGatewayScore(turn, myGeneration);
         break;
       }
       case 'reply.started':
@@ -548,6 +582,7 @@ export function createVoiceController(
     lastEvaluateAttempt = null;
     evalQueue = Promise.resolve();
     queuedEvals = 0;
+    pendingGatewayScores.clear();
     seenProviderItems.clear();
     gate.reset();
     agentDeltaBuffers.clear();
@@ -644,7 +679,7 @@ export function createVoiceController(
     const drainDeadline = merged.now() + FINISH_DRAIN_MS;
     while (merged.now() < drainDeadline) {
       flushReadyToolResults();
-      if (queuedEvals === 0 && pendingEvals.size === 0 && gate.readyToSend().length === 0) break;
+      if (queuedEvals === 0 && pendingEvals.size === 0 && pendingGatewayScores.size === 0 && gate.readyToSend().length === 0) break;
       await sleep(100);
       if (myGeneration !== generation) return;
     }

@@ -1,0 +1,14 @@
+**
+!app.js
+!package.json
+!server-dist/
+!server-dist/**
+!dist/
+!dist/**
+!spec/
+!spec/**
+!prompts/
+!prompts/**
+!deploy/
+!deploy/contabo/
+!deploy/contabo/Dockerfile

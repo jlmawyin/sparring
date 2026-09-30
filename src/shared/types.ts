@@ -10,6 +10,9 @@ export interface StartRequest { scenario_id: string; scenario_version: string; c
 export interface StartResponse { session_id: string; session_context: string; token: string; max_seconds: number; deadline: number; session_config: Record<string, unknown>; }
 export interface EvaluateRequest { session_context: string; revision: number; tool_call_id: string; tool_name: 'score_rubric' | 'log_objection'; arguments: Record<string, unknown>; transcript_final: Turn[]; }
 export interface EvaluateResponse { snapshot: ScoreSnapshot; result: Record<string, unknown>; processing_ms: number; }
+export type ScoreTurnStatus = 'scored' | 'no_observation' | 'duplicate' | 'incomplete';
+export interface ScoreTurnRequest { session_context: string; turn_id: string; transcript_final: Turn[]; }
+export interface ScoreTurnResponse { status: ScoreTurnStatus; reason?: string; snapshot: ScoreSnapshot; }
 export type VoiceState = 'idle' | 'preparing' | 'connecting' | 'roleplay' | 'finalizing' | 'coaching' | 'ending' | 'ended' | 'error';
 export interface VoiceCallbacks { onState(state: VoiceState): void; onTurn(turn: Turn): void; onPartial(role: 'USER' | 'AGENT', text: string): void; onSnapshot(snapshot: ScoreSnapshot): void; onError(message: string): void; onEvent?(type: string): void; }
 export interface VoiceController { start(scenario: ScenarioBrief): Promise<void>; finish(): Promise<void>; stop(): void; }

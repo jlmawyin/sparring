@@ -1,17 +1,17 @@
 # Sparring
 
-Sparring helps sales and support teams rehearse difficult customer conversations by voice. A simulated customer raises objections; in-call tool calls propose observations; the server checks exact quotes and computes a transparent, weighted rubric. The trainee ends with focused coaching and can practice again.
+Sparring helps sales and support teams rehearse difficult customer conversations by voice. A simulated customer raises objections; application-triggered in-call scoring proposes observations; the server checks exact quotes and computes a transparent, weighted rubric. The trainee ends with focused coaching and can practice again.
 
-Built for the [AssemblyAI Voice Agent Hackathon](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon). Try the [public demo](https://sparring.visitaremota.com/). The frontend is live. The production voice backend and a human microphone test are release gates in progress; the public page shows scenario previews until the API is installed. Automated tests use a mocked AssemblyAI provider and do not prove a live call.
+Built for the [AssemblyAI Voice Agent Hackathon](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon). Try the [public demo](https://sparring.visitaremota.com/). The public frontend and voice API are live on Contabo; a second human call is still needed to verify in-call scoring. The first local human call confirmed the conversation but produced no score. Automated tests use a mocked AssemblyAI provider and do not prove live scoring.
 
 ## What is implemented
 
 - Three fictional scenarios: late delivery, price comparison, and cancellation after an apparent duplicate charge.
 - Browser microphone, PCM audio, WebSocket interaction with AssemblyAI's Voice Agent API, and user interruption handling.
-- `score_rubric` and `log_objection` tool calls during the conversation; quoted evidence validation and deterministic scoring in the application server.
+- Deterministic local scoring after each finalized user turn (default), with optional AssemblyAI LLM Gateway forced function calling for entitled accounts. Voice Agent `score_rubric` and `log_objection` calls are also accepted; the server validates exact quotations and computes score math.
 - A local Node adapter for development and a separate Node production adapter that serves `dist/` plus `/api` from one origin. Production voice minutes are reserved in a durable file ledger with a process-shared lock.
 
-The system does not store audio. It stores the current transcript and evaluation in memory for the life of a session. The score is formative feedback: the server verifies quote anchoring and arithmetic, but cannot certify whether the AI's semantic judgment is correct or whether a browser-supplied transcript is authentic.
+The system does not store audio. It stores the current transcript and evaluation in memory for the life of a session. The score is formative feedback: local rules can miss a good response phrased differently, and neither mode can certify performance or authenticate a browser-supplied transcript.
 
 ## Run locally
 

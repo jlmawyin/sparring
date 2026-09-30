@@ -4,9 +4,10 @@ import { createServer, type Server } from 'node:http';
 import { dirname, extname, join, normalize, resolve as resolvePath, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Health, ScoreSnapshot, StartResponse } from '../src/shared/types.ts';
-import { catalog, coachPrompt, scenarios, sessionConfig } from './catalog.ts';
+import { catalog, coachPrompt, rubric, scenarios, sessionConfig } from './catalog.ts';
 import { ApiError, boundedString, closedObject, invalid } from './errors.ts';
 import { evaluate, newEvaluation, snapshot, validateEvaluateEnvelope, type EvaluationState } from './evaluator.ts';
+import { scoreLatestTurn, type ScoringMode } from './gatewayScore.ts';
 import { boundedEnvInt } from './env.ts';
 import { readBody, respond } from './http.ts';
 import { mintToken } from './token.ts';
@@ -47,6 +48,10 @@ interface Session {
   evaluation: EvaluationState;
   ended: boolean;
   finish?: { snapshot: ScoreSnapshot; coach_prompt: string };
+  gatewayProcessedTurns: Set<string>;
+  gatewayInFlightTurns: Set<string>;
+  gatewayCallCount: number;
+  gatewayQueue: Promise<void>;
 }
 
 export interface ProductionAppOptions {
@@ -56,6 +61,10 @@ export interface ProductionAppOptions {
   now?: () => number;
   /** Shorten a timeout only for deterministic failure tests. */
   tokenTimeoutMs?: number;
+  /** Shorten a timeout only for deterministic failure tests. */
+  gatewayTimeoutMs?: number;
+  /** Lower the per-session Gateway call cap only for deterministic tests. */
+  gatewayMaxCallsPerSession?: number;
   /** Directory containing the built frontend (vite build output). Defaults to ../dist next to this module. */
   staticDir?: string;
   /** Path to the durable quota ledger file. Defaults to ../var/quota.json next to this module. */
@@ -90,6 +99,7 @@ export function createProductionApp(options: ProductionAppOptions = {}): Server 
   const now = options.now ?? Date.now;
   const key = env.ASSEMBLYAI_API_KEY?.trim() ?? '';
   const enabled = env.SPARRING_VOICE_ENABLED === 'true';
+  const scoringMode: ScoringMode = env.SPARRING_SCORING_MODE === 'gateway' ? 'gateway' : 'local';
   const sessionSeconds = boundedEnvInt(env.SPARRING_MAX_SESSION_SECONDS, 60, 240, DEFAULT_SESSION_SECONDS);
   const dailySeconds = boundedEnvInt(env.SPARRING_DAILY_MINUTES_CAP, 1, 30, DEFAULT_DAILY_MINUTES) * 60;
   const staticDir = resolvePath(options.staticDir ?? env.SPARRING_STATIC_DIR ?? DEFAULT_STATIC_DIR);
@@ -157,7 +167,7 @@ export function createProductionApp(options: ProductionAppOptions = {}): Server 
       }
       if (request.method === 'GET' && path === '/api/catalog') { respond(response, 200, catalog); return; }
       if (request.method !== 'POST') throw new ApiError(404, 'not_found', 'La operación solicitada no existe.');
-      if (!['/api/session/start', '/api/evaluate', '/api/session/finish', '/api/session/end'].includes(path)) {
+      if (!['/api/session/start', '/api/evaluate', '/api/session/score-turn', '/api/session/finish', '/api/session/end'].includes(path)) {
         throw new ApiError(404, 'not_found', 'La operación solicitada no existe.');
       }
       const body = await readBody(request);
@@ -175,7 +185,11 @@ export function createProductionApp(options: ProductionAppOptions = {}): Server 
           if (reservation.reason === 'session_active') throw new ApiError(429, 'session_active', 'Ya hay una práctica activa en este servidor.');
           throw new ApiError(429, 'daily_limit', 'Se alcanzó el límite diario de voz de este servidor.');
         }
-        const session: Session = { id: randomUUID(), deadline: now() + sessionSeconds * 1000, scenario, evaluation: newEvaluation(), ended: false };
+        const session: Session = {
+          id: randomUUID(), deadline: now() + sessionSeconds * 1000, scenario, evaluation: newEvaluation(), ended: false,
+          gatewayProcessedTurns: new Set(), gatewayInFlightTurns: new Set(), gatewayCallCount: 0,
+          gatewayQueue: Promise.resolve(),
+        };
         sessions.set(context, session);
         try {
           const ephemeral = await token();
@@ -199,6 +213,18 @@ export function createProductionApp(options: ProductionAppOptions = {}): Server 
         validateEvaluateEnvelope(body);
         const session = sessionFor(body.session_context);
         const result = evaluate(session.evaluation, body, session.scenario.objeciones.map(item => item.id), now);
+        respond(response, 200, result); return;
+      }
+      if (path === '/api/session/score-turn') {
+        closedObject(body, ['session_context', 'turn_id', 'transcript_final']);
+        const session = sessionFor(body.session_context);
+        const result = await scoreLatestTurn(
+          session, body.session_context as string, { turn_id: body.turn_id, transcript_final: body.transcript_final },
+          rubric, {
+            key, fetch: upstream, mode: scoringMode,
+            timeoutMs: options.gatewayTimeoutMs, maxCallsPerSession: options.gatewayMaxCallsPerSession, now,
+          },
+        );
         respond(response, 200, result); return;
       }
       closedObject(body, ['session_context']);

@@ -74,7 +74,7 @@ export function validateEvaluateEnvelope(value: unknown): asserts value is Evalu
     !isRecord(value.arguments) || !Array.isArray(value.transcript_final)) invalid();
 }
 
-function validateTranscript(value: Turn[], previous: Turn[]): void {
+export function validateTranscript(value: Turn[], previous: Turn[]): void {
   if (value.length > 200) invalid();
   const ids = new Set<string>();
   for (const turn of value) {

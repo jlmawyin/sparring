@@ -6,6 +6,8 @@ import type {
   StartResponse,
   EvaluateRequest,
   EvaluateResponse,
+  ScoreTurnRequest,
+  ScoreTurnResponse,
 } from '../shared/types';
 
 async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
@@ -34,6 +36,11 @@ export function startSession(req: StartRequest, signal?: AbortSignal): Promise<S
 
 export function evaluate(req: EvaluateRequest, signal?: AbortSignal): Promise<EvaluateResponse> {
   return postJson<EvaluateResponse>('/api/evaluate', req, signal);
+}
+
+/** Asynchronous, best-effort: scores one finalized USER turn via the server's Gateway path. */
+export function scoreTurn(req: ScoreTurnRequest, signal?: AbortSignal): Promise<ScoreTurnResponse> {
+  return postJson<ScoreTurnResponse>('/api/session/score-turn', req, signal);
 }
 
 export interface FinishResponse {

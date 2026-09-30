@@ -1,0 +1,44 @@
+services:
+  sparring:
+    build:
+      context: ../..
+      dockerfile: deploy/contabo/Dockerfile
+    image: sparring:2026-09-30
+    container_name: sparring-app
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      NODE_ENV: production
+      SPARRING_HOST: 0.0.0.0
+      SPARRING_PORT: "8788"
+      SPARRING_STATIC_DIR: /app/dist
+      SPARRING_QUOTA_FILE: /data/quota.json
+      SPARRING_SCORING_MODE: local
+      SPARRING_VOICE_ENABLED: "true"
+      SPARRING_MAX_SESSION_SECONDS: "240"
+      SPARRING_DAILY_MINUTES_CAP: "30"
+    networks:
+      - net-core-services
+    volumes:
+      - ../../var:/data
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 100
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8788/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  net-core-services:
+    external: true
