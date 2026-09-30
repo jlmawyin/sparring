@@ -1,5 +1,23 @@
 # Relevo de Sparring
 
+## ORQUESTADOR CLAUDE (Opus 5) — 2026-09-29 ~23:45 ECT
+
+- Jorge autorizó usar créditos y puso a Claude como relevo operativo mientras Codex espera su ventana (reset 2026-09-30 01:29:51 ECT). Grok/Agy quedan como agentes de Claude sólo si su capacidad aporta. No se canjean resets ni se compran créditos.
+- Estado verificado al abrir, no heredado: `master` limpio, `HEAD == origin/master == 1132e25`. `https://sparring.visitaremota.com/` responde 200 y `/api/health` devuelve `{status:ok,key_configured:true,voice_enabled:true,mode:production}`. No se desplegó, no se tocó DNS ni otros contenedores de Contabo. No se releyó ni se imprimió `.env`. **No se reintentó el Gateway de AssemblyAI**: la cuenta no tiene acceso al modelo.
+- **G1 público sigue PENDIENTE de la prueba humana de Jorge.** `docs/LIVE-CHECK.md` conserva `LIVE_FAILED_SCORING` del intento local anterior. Nada de este lote acredita G1: no se hizo ninguna llamada de voz real.
+- Trabajo de este lote: quedó lista y medida la cadena de grabación del video, que era el único frente que podía avanzar sin Jorge.
+  - `submission-assets/recording-setup.md` (nuevo) — flujo de captura y edición con las mediciones de esta máquina, no supuestos.
+  - `scripts/record-demo.ps1` (nuevo) — captura de respaldo por CLI con micrófono y audio de sistema en archivos separados.
+  - `scripts/check-recording.ps1` (nuevo) — verifica duración, fps reales y actividad de audio por pista.
+- Hallazgo medido que determinó el diseño: con un solo proceso de ffmpeg, añadir la entrada de audio dshow hunde `gdigrab` de **28,8 a 4,8 fps**, y `-thread_queue_size 1024` no lo corrige (5,8 fps). Capturar 1920×1080 también cae a 5,3 fps. Se descartó por medición la hipótesis del preset del encoder: `amf quality` 26,8 / `amf balanced` 27,0 / `amf speed` 28,4 / `libx264 veryfast` 27,6 fps. Por eso la captura principal es **Xbox Game Bar** (encoder de hardware, sincronía A/V propia, 1080p) y la ruta CLI es respaldo con **dos procesos** separados.
+- Autopruebas reales de la ruta de respaldo: vídeo 1280×720 a **27,4–28,2 fps efectivos**, duración exacta, deriva audio/vídeo de **3 ms en 20 s** y desfase de arranque de **53–70 ms**, que el script registra en un `.json` para aplicarlo con `-itsoffset`. Se grabó siempre con `-NoMic`: no se capturó la voz de nadie.
+- El verificador se validó en los dos sentidos: contra un control sintético (tono 0–3 s, silencio 3–6 s, tono 6–9 s) devolvió exactamente `0,00→3,02 s` y `6,01→9,00 s`; contra una captura real en silencio reportó `SIN ACTIVIDAD` a −91 dB. Los archivos de prueba se borraron.
+- Herramienta: ffmpeg 9.0.2 en `.cache/bin/` (ignorado por Git), **sin instalar al sistema ni tocar el PATH**, igual que el precedente de `cloudflared.exe`. Los builds de gyan.dev no llevan firma Authenticode, así que la procedencia se comprobó por SHA-256 contra el hash publicado: **coincide**. Dispositivos confirmados: `Virtual audio desktop` (loopback, 48 kHz) y `Micrófono (2- Trust GXT 232 Microphone)`.
+- No se ejecutó la suite de la aplicación en este lote porque no se tocó código de la app: los tres archivos son documentación y scripts de grabación. La evidencia vigente sigue siendo la anterior (176/176 unitarias, build, `validate:spec`, 8/8 E2E), toda con AssemblyAI simulado.
+- Siguiente paso, humano y no de agentes: Jorge hace el G1 público (consentimiento → iniciar → responder al reclamo) y reporta voz, **Cobertura de la rúbrica** subiendo, rótulo **Resultado provisional** en llamada, coaching y liberación del micrófono. Sólo entonces se registra en `docs/LIVE-CHECK.md` y se graba la toma buena. Si falla, se diagnostica con una prueba discriminante y se corrige acotadamente antes de grabar.
+- El formulario lablab (`submission-assets/form-copy.md`) tiene `Video: PENDING`. **No se envía nada sin el visto bueno concreto de Jorge** sobre el resultado real.
+
+
 ## ORQUESTADOR GROK — 2026-09-29 ~23:20 ECT
 
 - Grok CLI (modelo grok-4.6) asumió orquestación. Codex permanece detenido hasta el reset de ventana 2026-09-30 01:29:51 ECT. No canjear resets ni créditos extra.
