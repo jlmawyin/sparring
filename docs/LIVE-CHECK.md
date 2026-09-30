@@ -1,10 +1,22 @@
-# Gate G1 — pruebas reales, puntuación aún no verificada
+# Gate G1 — nota real verificada; continuidad pendiente
+
+## Prueba pública 2026-09-30 ~01:30 ECT, versión `03ebc38`
+
+La recuperación sí produjo una réplica después de un reply vacío, pero la llamada resultó peor para Jorge: el cliente se cortó y reanudó, el usuario trató de hablar y la interacción perdió continuidad. En Edge se observaron `input.speech.started` durante una respuesta del agente, luego `reply.done completed` y `recovery reply.create sent` **antes** de `input.speech.stopped`. Tras 03:15, el coaching indicó evaluación incompleta y la UI mostró 20 % de cobertura y `—/100`. No usar esta toma como evidencia positiva.
+
+`46a7b2c` corrige ese solapamiento: al detectar habla del usuario silencia el audio local al instante, cancela la recuperación del turno anterior e impide reintentar durante la intervención. 205/205 unitarias, build PASS y 8/8 E2E simuladas PASS; asset público `index-H7ZFJrXC.js`, Docker sano y `/api/health` 200. **La siguiente práctica humana corta está pendiente**. Si vuelve a fallar, conservar la pestaña y revisar la secuencia; no declarar G1 PASS ni grabar video por los tests.
 
 ## Cuarta prueba solicitada — bloqueo tras el primer turno
 
 Jorge reportó que en la versión anterior el cliente simulado pronunció la apertura, recibió una respuesta USER y no volvió a hablar. Finalizó manualmente; el coaching tomó esa única respuesta y no hubo nota numérica. La UI había registrado 40 % de cobertura, así que la ausencia de nota era coherente con el umbral, pero el silencio del cliente **sí es un fallo de continuidad**. El 2026-09-30 ~01:00 ECT se publicó el fix protocolario `98025a3`: una `tool.call` que llega después de su `reply.done` ya puede devolver `tool.result` en el instante permitido. Tests 196/196, 8/8 E2E simuladas, build y salud pública PASS. Pestaña Edge de prueba abierta con `?voiceDebug=1`, que registra sólo tipos de eventos. **Resultado humano de esta cuarta prueba pendiente; no declarar G1 PASS aún.**
 
-La primera llamada con persona sí ocurrió; aún no acredita G1 porque no hubo puntuación en vivo. No subir API keys, tokens ni capturas del dashboard con credenciales.
+### Resultado humano después de `98025a3`
+
+- En otro navegador, el cliente respondió una vez a intervenciones USER fragmentadas y formuló «¿Antes de qué? No tengo tiempo para rodeos, dígame qué solución me ofrece para compensar el tiempo perdido.» El usuario propuso reembolso del envío de USD 25 o escalar la compensación con respuesta en 4 horas hábiles, sin prometer el 30 %. No hubo réplica del cliente después de esa propuesta. La captura de coaching a 03:17 mostró **67/100 con 65 % de cobertura**. Queda verificada una nota numérica real, pero no continuidad completa ni cierre natural del roleplay.
+- En Edge con `?voiceDebug=1`, Codex observó una llamada nueva con saludo, una transcripción USER y 40 % de cobertura. La secuencia de tipos tras `transcript.user` fue `reply.started` → `reply.done completed`, sin `transcript.agent`, sin `tool.call` y sin `session.error`; permaneció sin respuesta durante más de un minuto. Se detuvo a 02:02 para no consumir más crédito. Esta traza distingue un **reply vacío del proveedor** de un `tool.result` retenido por nuestro gate en esa llamada. No prueba por qué el proveedor produjo el reply vacío.
+- El commit `03ebc38` ya publica una recuperación acotada: si un turno USER finalizado recibe `reply.done completed` sin audio, `transcript.agent` ni `tool.call`, espera 1 s por eventos tardíos y envía **un** `reply.create`; una segunda respuesta vacía muestra error sin entrar en bucle. Evita duplicar una respuesta cuyo audio llegó antes del texto; cancela la recuperación al terminar o cortar. Integración: 203/203 unitarias, build/spec PASS, 8/8 E2E simuladas PASS. Contenedor público sano y asset `index-CwTUkjtL.js` verificado. **La conversación humana posterior a este despliegue está en curso; no declarar continuidad aprobada por los tests.**
+
+La llamada más reciente en otro navegador mostró 67/100 con 65 % de cobertura, pero el cliente dejó de responder tras la última propuesta. G1 completo sigue pendiente de una conversación continua. No subir API keys, tokens ni capturas del dashboard con credenciales.
 
 1. Guardar `ASSEMBLYAI_API_KEY` en `.env` y `SPARRING_VOICE_ENABLED=true`. Ejecutar `npm run dev` y abrir http://127.0.0.1:5173 en Chrome o Edge. El archivo está ignorado por Git; la clave no debe usar prefijo `VITE_`.
 2. Elegir **Entrega demorada**. Leer hechos y autoridad, aceptar procesamiento por AssemblyAI e iniciar. Confirmar saludo en español y texto coherente. Hablar al menos 90 segundos; sólo usar datos ficticios.
