@@ -1,5 +1,9 @@
 # Gate G1 — pruebas reales, puntuación aún no verificada
 
+## Cuarta prueba solicitada — bloqueo tras el primer turno
+
+Jorge reportó que en la versión anterior el cliente simulado pronunció la apertura, recibió una respuesta USER y no volvió a hablar. Finalizó manualmente; el coaching tomó esa única respuesta y no hubo nota numérica. La UI había registrado 40 % de cobertura, así que la ausencia de nota era coherente con el umbral, pero el silencio del cliente **sí es un fallo de continuidad**. El 2026-09-30 ~01:00 ECT se publicó el fix protocolario `98025a3`: una `tool.call` que llega después de su `reply.done` ya puede devolver `tool.result` en el instante permitido. Tests 196/196, 8/8 E2E simuladas, build y salud pública PASS. Pestaña Edge de prueba abierta con `?voiceDebug=1`, que registra sólo tipos de eventos. **Resultado humano de esta cuarta prueba pendiente; no declarar G1 PASS aún.**
+
 La primera llamada con persona sí ocurrió; aún no acredita G1 porque no hubo puntuación en vivo. No subir API keys, tokens ni capturas del dashboard con credenciales.
 
 1. Guardar `ASSEMBLYAI_API_KEY` en `.env` y `SPARRING_VOICE_ENABLED=true`. Ejecutar `npm run dev` y abrir http://127.0.0.1:5173 en Chrome o Edge. El archivo está ignorado por Git; la clave no debe usar prefijo `VITE_`.
