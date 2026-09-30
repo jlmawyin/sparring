@@ -397,6 +397,37 @@ describe('scoreLatestTurn: local scorer empathy level 3 requires concrete impact
     const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
     expect(result.snapshot.criteria.find(c => c.id === 'empathy')?.level).toBe(3);
   });
+
+  it('a clause naming the cause between "impacto" and the concrete noun (real agent phrasing) is still level 3', async () => {
+    const s = session();
+    const t = turn(
+      'Entiendo el impacto de los 2 días de retraso tuvieron en la operación de su equipo. Lamento la demora. Antes de proponerle un paso, ¿qué es lo urgente para ustedes hoy?'
+    );
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'empathy')?.level).toBe(3);
+  });
+
+  it('the scripted phrasing "entiendo el impacto que los dos días de retraso tuvieron en la operación de su equipo" is level 3', async () => {
+    const s = session();
+    const t = turn('Entiendo el impacto que los dos días de retraso tuvieron en la operación de su equipo.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'empathy')?.level).toBe(3);
+  });
+
+  it('a concrete noun far past the gap does not turn a bare "entiendo el impacto" into level 3', async () => {
+    const s = session();
+    const gapFiller = 'x'.repeat(95); // > the 90-char gap allowed between "impacto" and the concrete noun
+    const t = turn(`Entiendo el impacto ${gapFiller} su equipo.`);
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'empathy')?.level ?? null).not.toBe(3);
+  });
+
+  it('does not borrow a concrete noun from the following sentence', async () => {
+    const s = session();
+    const t = turn('Entiendo el impacto. Su equipo necesita una solución.');
+    const result = await scoreLatestTurn(s, 'ctx', { turn_id: t.turn_id, transcript_final: [t] }, rubric, { key: 'k', fetch: fetchMock });
+    expect(result.snapshot.criteria.find(c => c.id === 'empathy')?.level ?? null).not.toBe(3);
+  });
 });
 
 describe('scoreLatestTurn: local scorer only inspects the cited <=500-char quote window', () => {

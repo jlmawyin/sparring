@@ -106,8 +106,15 @@ type GatewayCallOutcome =
 // null (excluded from coverage), which is always safer than a fabricated one.
 
 const EMPATHY_INVALIDATE = /usted\s+est[aá]\s+exagerando|eso\s+no\s+es\s+mi\s+problema|no\s+es\s+mi\s+culpa/i;
-/** Requires a concrete noun near "impacto": the bare phrase "entiendo el impacto" alone must not qualify. */
-const EMPATHY_IMPACT_CONCRETE = /(entiendo|comprendo|reconozco)\s+(el|su)\s+impacto[\s\S]{0,40}(equipo|negocio|operaci[oó]n|trabajo|p[eé]rdidas|financiero|operativo)/i;
+/**
+ * Requires a concrete noun near "impacto": the bare phrase "entiendo el impacto" alone
+ * must not qualify. The gap allows for a clause naming the cause (e.g. "que los 2 días
+ * de retraso tuvieron en la operación de su equipo") between "impacto" and the concrete
+ * noun, so real agent phrasing like "entiendo el impacto que los dos días de retraso
+ * tuvieron en la operación de su equipo" is still recognized, while a lone
+ * "entiendo el impacto" with no qualifying noun anywhere nearby still falls through.
+ */
+const EMPATHY_IMPACT_CONCRETE = /(entiendo|comprendo|reconozco)\s+(el|su)\s+impacto[^.!?]{0,90}(equipo|negocio|operaci[oó]n|trabajo|p[eé]rdidas|financiero|operativo)/i;
 const EMPATHY_VALIDATE = /entiendo\s+(su|la)\s+(frustraci[oó]n|molestia|preocupaci[oó]n|urgencia)|lamento\s+(mucho\s+)?(el|la|los)\s+(retraso|demora|inconveniente|situaci[oó]n)/i;
 const EMPATHY_CLICHE = /disculpe\s+las\s+molestias|lo\s+sentimos|lo\s+siento\b|lamentamos\s+lo\s+sucedido/i;
 
