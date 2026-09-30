@@ -6,6 +6,8 @@
 - Codex corrigió el texto del formulario para distinguir las herramientas que el Voice Agent puede invocar del evaluador determinista que sí puntúa cada turno finalizado en producción. Commit `3d5d303` publicado en `origin/master`; árbol limpio. El texto está en `submission-assets/form-copy.md`.
 - G1 público humano sigue PENDIENTE: la pregunta ya se envió a Jorge. Esperar resultado de cobertura, nota provisional, feedback hablado y liberación de micrófono antes de declarar PASS, grabar la toma o cerrar el formulario. El intento local anterior fue `LIVE_FAILED_SCORING` antes de la corrección; 176 unitarias y 8 E2E son simuladas, no prueba pública.
 - Si G1 pasa, prueba de audio de 20 s según `submission-assets/recording-setup.md`, luego toma continua real y edición del MP4. Si falla, Claude recibe diagnóstico y corrección acotada; repetir pruebas pertinentes y desplegar sólo Sparring. Al terminar, preparar el formulario completo para visto bueno concreto de Jorge antes de envío final.
+- La página oficial de lablab muestra horas contradictorias: cabecera `Sep 30, 10:00 AM ET` y programa `Sep 30, 10:00 AM Ecuador Time`. Tratar **09:00 ECT** como límite operativo conservador y enviar con margen; no asumir que hay plazo hasta las 10:00 ECT.
+- El formulario real aún no se inspeccionó: Edge mostró `Sign in` (sesión de lablab cerrada). La pestaña del evento quedó abierta para que Jorge inicie sesión por sí mismo. Se le pidió hacerlo después de la práctica pública; no introducir credenciales en chat.
 
 ## ORQUESTADOR CLAUDE (Opus 5) — 2026-09-29 ~23:45 ECT
 
