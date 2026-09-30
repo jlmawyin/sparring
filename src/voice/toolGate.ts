@@ -1,21 +1,34 @@
 // Tracks in-flight tool.call -> tool.result lifecycle against the
 // AssemblyAI reply/turn timeline so results are only sent while still
-// valid: strictly after their OWN reply.done(completed) — never while that
-// reply is still open — and never after a newer reply or user speech has
-// started (which means the conversation moved on and the result is stale).
-// Every outcome (success, unknown_tool, argument conflict, quote-not-found)
-// flows through this same gate so nothing is ever sent out of turn.
+// valid. Per AssemblyAI's Client-side tools docs (Voice Agent API,
+// "tools/client-side-tools", the ordering rule spelled out around the
+// flush_if_idle example): send tool.result ONLY while reply.done is the
+// LATEST event seen — never while a reply.started or input.speech.started
+// has arrived more recently than the last reply.done. A call becomes
+// eligible only after its OWN reply.done(completed); an interrupted reply
+// discards it outright.
+//
+// Per AssemblyAI's events reference, a tool.call always arrives bound to a
+// reply: either an ordinary spoken reply, or a silent tool-only reply whose
+// reply_id follows the `fc-<call_id>` convention. reply.done ALWAYS carries
+// reply_id + status, never a bare `{type:'reply.done'}`. Event ordering
+// between a tool-call reply's reply.started/reply.done and the tool.call
+// event itself is not guaranteed relative to our own processing, so a
+// tool.call that arrives with no reply currently open is bound to the
+// expected `fc-<call_id>` reply id and, per the docs' flush_if_idle
+// pattern, is immediately closeable if that reply's reply.done already
+// arrived — otherwise it waits for that reply's own future reply.done.
 
 export type ToolGateStatus = 'pending' | 'ready' | 'sent' | 'cancelled';
 
 interface CallRecord {
   callId: string;
   argsHash: string;
-  replyId: string | null;
+  replyId: string;
   status: ToolGateStatus;
   result?: { payload: string; isError: boolean };
-  /** Sequence value at which this call's OWN reply completed (undefined = not done yet). */
-  closedAtSeq?: number;
+  /** True once this call's OWN reply.done(completed) has arrived. */
+  closed: boolean;
 }
 
 export interface RegisterOutcome {
@@ -31,17 +44,25 @@ export class ToolResultGate {
   private readonly calls = new Map<string, CallRecord>();
   /** reply_id of the reply currently open (started, not yet done). */
   private openReplyId: string | null = null;
-  /** Monotonic counter bumped by any event that can invalidate a pending result. */
-  private sequence = 0;
+  /** Terminal status of every reply.done seen so far, keyed by reply_id. */
+  private readonly finishedReplies = new Map<string, 'completed' | 'interrupted'>();
+  /** True whenever the LATEST protocol event was reply.started or input.speech.started (never sendable while true). */
+  private turnOpen = false;
 
   register(callId: string, argsHash: string): RegisterOutcome {
     const existing = this.calls.get(callId);
     if (!existing) {
+      // Bind to whichever reply is currently open; if none is open (e.g. this
+      // tool.call arrived before its own reply.started, or after its own
+      // reply.done), fall back to the documented `fc-<call_id>` reply id.
+      const replyId = this.openReplyId ?? `fc-${callId}`;
+      const finished = this.finishedReplies.get(replyId);
       this.calls.set(callId, {
         callId,
         argsHash,
-        replyId: this.openReplyId,
-        status: 'pending',
+        replyId,
+        status: finished === 'interrupted' ? 'cancelled' : 'pending',
+        closed: finished === 'completed',
       });
       return { isNew: true, conflict: false };
     }
@@ -55,13 +76,19 @@ export class ToolResultGate {
   }
 
   onReplyStarted(replyId: string): void {
-    this.sequence += 1;
     this.openReplyId = replyId;
+    this.turnOpen = true;
   }
 
-  /** input.speech.started: the user is talking again, invalidate anything not sent yet. */
+  /**
+   * input.speech.started: a new user turn is beginning. Per the docs'
+   * ordering rule this makes the gate not-idle again — nothing may be sent
+   * until the next reply.done becomes the latest event — but it must NOT
+   * discard any pending call's eventual eligibility. Discarding a call is
+   * only ever driven by that call's own reply.done(interrupted).
+   */
   onUserSpeechStarted(): void {
-    this.sequence += 1;
+    this.turnOpen = true;
   }
 
   /** Attach a completed HTTP evaluation (or validation error) result. */
@@ -74,39 +101,43 @@ export class ToolResultGate {
 
   /**
    * reply.done for `replyId`. status 'completed' marks calls tied to that
-   * reply as closeable (sendable) as of the CURRENT sequence; 'interrupted'
-   * cancels them outright so a stale result can never be sent.
+   * reply as closeable (sendable once ready and once the gate is idle
+   * again); 'interrupted' cancels them outright so a stale result can never
+   * be sent. Also records this reply.done as the latest event, opening the
+   * gate for any other call already ready and closed.
    */
   onReplyDone(replyId: string, status: 'completed' | 'interrupted'): void {
     if (this.openReplyId === replyId) this.openReplyId = null;
+    this.finishedReplies.set(replyId, status);
+    this.turnOpen = false;
     for (const record of this.calls.values()) {
       if (record.replyId !== replyId) continue;
       if (status === 'interrupted') {
         if (record.status !== 'sent') record.status = 'cancelled';
       } else {
-        record.closedAtSeq = this.sequence;
+        record.closed = true;
       }
     }
   }
 
   /**
-   * True only once this call's OWN reply has completed (not merely started)
-   * and no newer reply/speech has begun since — a call is never sendable
-   * while its reply is still open, and becomes permanently stale the
-   * instant something newer starts.
+   * True only once: this call's OWN reply has completed (not merely
+   * started), a result is attached, AND reply.done is still the latest
+   * protocol event (no newer reply.started/input.speech.started since).
    */
   canSend(callId: string): boolean {
+    if (this.turnOpen) return false;
     const record = this.calls.get(callId);
     if (!record || record.status !== 'ready') return false;
-    if (record.closedAtSeq === undefined) return false; // reply not done yet
-    return record.closedAtSeq === this.sequence;
+    return record.closed;
   }
 
   /** call_ids whose result is ready to send under the current gate state. */
   readyToSend(): string[] {
+    if (this.turnOpen) return [];
     const ids: string[] = [];
     for (const [id, record] of this.calls) {
-      if (record.status === 'ready' && record.closedAtSeq === this.sequence) {
+      if (record.status === 'ready' && record.closed) {
         ids.push(id);
       }
     }
@@ -134,7 +165,8 @@ export class ToolResultGate {
   reset(): void {
     this.calls.clear();
     this.openReplyId = null;
-    this.sequence = 0;
+    this.finishedReplies.clear();
+    this.turnOpen = false;
   }
 }
 

@@ -254,6 +254,9 @@ export function createVoiceController(
     const result = gate.getResult(callId);
     if (!result) return;
     transport.sendToolResult(callId, result.payload, result.isError);
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('voiceDebug')) {
+      console.info('[sparring-voice] tool.result sent');
+    }
     gate.markSent(callId);
   }
 
@@ -401,6 +404,10 @@ export function createVoiceController(
 
   function onServerEvent(ev: ServerEvent, myGeneration: number): void {
     if (myGeneration !== generation) return;
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('voiceDebug') &&
+      ev.type !== 'reply.audio' && ev.type !== 'transcript.user.delta' && ev.type !== 'transcript.agent.delta') {
+      console.info('[sparring-voice]', ev.type, ev.type === 'reply.done' ? ev.status : '');
+    }
     callbacks.onEvent?.(ev.type);
 
     switch (ev.type) {

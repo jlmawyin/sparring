@@ -87,7 +87,7 @@ describe('ToolResultGate reply/turn gating', () => {
     expect(gate.canSend('call1')).toBe(true);
   });
 
-  it('invalidates a pending (not-yet-sent) ready result when a newer reply starts (later reply invalidates)', () => {
+  it('per docs, stops being sendable the moment a newer reply starts, and only resumes once THAT reply also reaches reply.done', () => {
     const gate = new ToolResultGate();
     gate.onReplyStarted('reply-1');
     gate.register('call1', hashArgs({ a: 1 }));
@@ -95,13 +95,18 @@ describe('ToolResultGate reply/turn gating', () => {
     gate.onReplyDone('reply-1', 'completed');
     expect(gate.canSend('call1')).toBe(true);
 
-    // A new reply begins before we flushed the result -> stale, permanently.
+    // A later reply.started means reply.done is no longer the latest event: must not send.
     gate.onReplyStarted('reply-2');
     expect(gate.canSend('call1')).toBe(false);
     expect(gate.readyToSend()).toEqual([]);
+
+    // Once reply-2 itself reaches reply.done, reply.done is the latest event again: flush.
+    gate.onReplyDone('reply-2', 'completed');
+    expect(gate.canSend('call1')).toBe(true);
+    expect(gate.readyToSend()).toEqual(['call1']);
   });
 
-  it('invalidates a pending ready result when the user starts speaking again (later speech invalidates)', () => {
+  it('per docs, stops being sendable once the user starts speaking again, until a reply.done follows', () => {
     const gate = new ToolResultGate();
     gate.onReplyStarted('reply-1');
     gate.register('call1', hashArgs({ a: 1 }));
@@ -110,6 +115,44 @@ describe('ToolResultGate reply/turn gating', () => {
     expect(gate.canSend('call1')).toBe(true);
 
     gate.onUserSpeechStarted();
+    expect(gate.canSend('call1')).toBe(false);
+    expect(gate.readyToSend()).toEqual([]);
+
+    gate.onReplyStarted('reply-2');
+    gate.onReplyDone('reply-2', 'completed');
+    expect(gate.canSend('call1')).toBe(true);
+    expect(gate.readyToSend()).toEqual(['call1']);
+  });
+
+  it('a tool.call that arrives before its own reply.started waits for that reply\'s own future reply.done (bound to fc-<call_id>)', () => {
+    const gate = new ToolResultGate();
+    // No onReplyStarted() at all: openReplyId stays null, so this binds to `fc-call1`.
+    gate.register('call1', hashArgs({ a: 1 }));
+    gate.setResult('call1', 'result', false);
+    expect(gate.canSend('call1')).toBe(false); // its own reply.done has not arrived yet
+
+    gate.onReplyDone('fc-call1', 'completed');
+    expect(gate.canSend('call1')).toBe(true);
+    expect(gate.readyToSend()).toEqual(['call1']);
+  });
+
+  it('a tool.call that arrives after its own reply.done already fired is closeable immediately (flush_if_idle from tool.call, per the docs example)', () => {
+    const gate = new ToolResultGate();
+    // The fc-<call_id> reply's reply.done arrives before we ever see the tool.call event.
+    gate.onReplyDone('fc-call1', 'completed');
+
+    gate.register('call1', hashArgs({ a: 1 }));
+    expect(gate.canSend('call1')).toBe(false); // no result yet
+
+    gate.setResult('call1', 'result', false);
+    expect(gate.canSend('call1')).toBe(true);
+    expect(gate.readyToSend()).toEqual(['call1']);
+  });
+
+  it('never sends before ANY reply.done has occurred, even with no reply ever explicitly opened', () => {
+    const gate = new ToolResultGate();
+    gate.register('call1', hashArgs({ a: 1 }));
+    gate.setResult('call1', 'result', false);
     expect(gate.canSend('call1')).toBe(false);
     expect(gate.readyToSend()).toEqual([]);
   });
