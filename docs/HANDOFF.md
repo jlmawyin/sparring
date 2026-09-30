@@ -1,5 +1,12 @@
 # Relevo de Sparring
 
+## SUBMITTED — 30 septiembre 2026, ~08:47 ECT (13:47 UTC)
+
+- Jorge indicó «Encárgate de subir todo lo que falte, debo salir» y «sigue», autorizando completar el envío. Se pulsó Submit una vez. Lablab confirmó explícitamente: «You have successfully submitted your project for the AssemblyAI - Voice Agent Hackathon event!».
+- Entrega pública verificada: https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon/sparring/sparring-practice-tough-customer-conversations . La página muestra título, video, descripción, enlaces Github/Presentation/Demo y «Judging is in progress».
+- Evidencia guardada en `submission-assets/submission-confirmed.png`. La documentación anterior con estado «pendiente de autorización/envío» queda histórica y superada por este bloque. NO volver a pulsar Submit ni crear otro borrador.
+- Codex disponible al abrir lote: 4%5h/1%semanal usado, restablecido por usuario. No se canjearon resets desde herramientas. Sólo cierre documental/paquete; app congelada.
+
 ## LISTO PARA VISTO BUENO FINAL — ~08:15 ECT
 
 - MP4 final `submission-assets/sparring-final-en.mp4`: 221,533333s (3:42),8379482bytes,1080p/15fps,H.264/AAC. Audio original ES,53 cues EN incrustados; ES/EN SRT guardados en submission-assets. Conversación sin cortes ni cambio de velocidad. Recorte de chrome, franja de subtítulos, normalización y8s de cierre editorial. SHA2565790ddfa9660f5a92c8d99ba8a683aa65ad18c6c82daf8054305c5b75a4499da. Docs/VIDEO-CHECK.md detalla pruebas; no se afirma auditoría humana completa del audio.

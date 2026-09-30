@@ -1,5 +1,7 @@
 # Sparring
 
+[Entrega publicada en lablab](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon/sparring/sparring-practice-tough-customer-conversations) — recibida el 30 de septiembre de 2026. Incluye video en español con subtítulos en inglés, presentación y demo.
+
 [Read this README in English](README.en.md).
 
 Entrena conversaciones difíciles con un cliente simulado por voz. Tres escenarios ficticios, cinco criterios de evaluación, citas de evidencia y coaching al finalizar. Proyecto para AssemblyAI Voice Agent Hackathon, septiembre de 2026.
@@ -52,6 +54,6 @@ Las pruebas no necesitan clave ni llaman a AssemblyAI. Playwright usa micrófono
 - [Reglas para agentes](AGENTS.md), [playbook reutilizable](ORCHESTRATOR-PLAYBOOK.md), [registro de orquestación](docs/ORCHESTRATION.md).
 - [Prompts de trabajo](docs/PROMPTS.md), [cliente](prompts/client-system.md), [coach](prompts/coach-system.md).
 
-No guardamos audio en esta aplicación. El proveedor procesa la voz según las condiciones de tu cuenta. La puntuación es formativa: verifica citas y cálculo, pero no certifica el juicio semántico de la IA ni protege frente a manipulación del navegador. Historial opt in, PWA, calibración humana y entrega del hackathon siguen pendientes.
+No guardamos audio en esta aplicación. El proveedor procesa la voz según las condiciones de tu cuenta. La puntuación es formativa: verifica citas y cálculo, pero no certifica el juicio semántico de la IA ni protege frente a manipulación del navegador. Historial opt in, PWA y calibración humana siguen pendientes. La entrega del hackathon fue recibida por lablab.
 
 Código propio bajo [MIT](LICENSE). El starter oficial clonado en `.cache` se excluye del repositorio y no se copia: su licencia sigue pendiente de verificación.

@@ -1,6 +1,6 @@
 # Paquete de entrega y guion
 
-Estado: demo pública activa en https://sparring.visitaremota.com/ y repositorio público en https://github.com/jlmawyin/sparring (rama master, código `2f622c0`). Portada, PDF corregido de seis páginas y video final cargados en el borrador lablab. Video final: 221,53 s, 8,38 MB, 1080p/15fps, H.264/AAC, voz española y subtítulos EN. Original `docs/sparring.mp4` intacto y fuera de Git. Feedback visible: 75 puntos y 100% de cobertura. Formulario al100% con repo/demo/hosting/notas completos. Submission NO enviada: falta visto bueno final de Jorge. No confundir el borrador guardado con una entrega final.
+Estado: **SUBMITTED**, confirmado por lablab el 30 de septiembre de 2026 aproximadamente a las08:47ECT (13:47UTC), tras autorización de Jorge. [Entrega pública](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon/sparring/sparring-practice-tough-customer-conversations). Portada, PDF de seis páginas, video y enlaces repo/demo publicados. Video final:221,53s,8,38MB,1080p/15fps,H.264/AAC,voz española y subtítulos EN. Original intacto y fuera de Git. Feedback real75/100,100%coverage. [Confirmación](../submission-assets/submission-confirmed.png).
 
 ## Posicionamiento
 
@@ -37,8 +37,8 @@ Portada existente: `submission-assets/cover.png`. No exige otra sesión ni una c
 - [ ] README: setup, variables sin valores, arquitectura, uso AAI, tests, limitaciones.
 - [ ] Demo HTTPS probada sin cuenta del builder, límites de gasto y acceso claros.
 - [ ] Versiones/commit de release y reporte de pruebas.
-- [ ] Formulario completo revisado por humano y envío autorizado.
-- [ ] Confirmación submitted/received, fecha/hora y URLs guardadas.
+- [x] Formulario completo revisado y envío autorizado por Jorge.
+- [x] Confirmación submitted/received, fecha/hora y URLs guardadas.
 
 Fuentes consultadas el 30 de septiembre de 2026: https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon y https://lablab.ai/ai-articles/hackathon-guidelines . La guía indica título máximo 50 caracteres, descripción corta máximo 255, larga mínimo 100 palabras y video de hasta 5 minutos y menos de 300 MB. Objetivo interno: completar con margen antes de 09:00 ECT; no apurar el cierre.
 

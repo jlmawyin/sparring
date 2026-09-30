@@ -1,4 +1,6 @@
-# Sparring — submission copy (review after live test)
+# Sparring — submitted copy
+
+Submitted September30,2026 ~08:47ECT. Public submission: https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon/sparring/sparring-practice-tough-customer-conversations
 
 ## Project title
 

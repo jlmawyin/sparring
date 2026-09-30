@@ -1,5 +1,7 @@
 # Sparring
 
+[Published hackathon submission](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon/sparring/sparring-practice-tough-customer-conversations) — received September 30, 2026, with Spanish demo audio, English subtitles, slides, and a live demo.
+
 Sparring helps sales and support teams rehearse difficult customer conversations by voice. A simulated customer raises objections; the application scores each finalized trainee turn, checks exact quotes, and computes a transparent, weighted rubric. The trainee ends with focused coaching and can practice again.
 
 Built for the [AssemblyAI Voice Agent Hackathon](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon). Try the [public demo](https://sparring.visitaremota.com/). The public frontend and voice API are live on Contabo. A recorded human practice on September 30 completed several conversational turns and showed **75/100 with 100% rubric coverage**. After earlier continuity failures, the customer prompt was simplified and a client retry that caused duplicate speech was removed. This recording demonstrates one completed session, not a guarantee for every call. Automated tests use a mocked AssemblyAI provider and are separate from the [recorded evidence](docs/VIDEO-CHECK.md).
