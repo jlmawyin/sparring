@@ -1,5 +1,11 @@
 # Gate G1 — nota real verificada; continuidad pendiente
 
+## Inicio rechazado por presupuesto local — corregido (2026-09-30 ~06:50 ECT)
+
+La captura de inicio fallido a 00:00 se diagnosticó como `daily_limit`: 28 min reservados de un límite de 30, con reserva de 4 min por inicio y ninguna sesión activa. `d35b3a7` configura 60 min en producción sin borrar el historial, permite ese máximo en ambos servidores y muestra errores específicos sin revelar mensajes privados del proveedor. Suite completa 201/201 PASS y prueba adicional de cota superior PASS; build/spec y 8/8 E2E simuladas PASS.
+
+Despliegue limitado a `sparring-app`, sano; asset público `index-CFX6LR85.js`. Smoke público **start 200 / end 200**, cierre inmediato sin micrófono ni WebSocket. Ledger después: **32/60 min reservados**, sin sesión activa. Edge quedó en Listo para practicar. **Inicio desbloqueado; continuidad de voz aún sin nueva verificación humana.** No atribuir este rechazo a la API ni declarar G1 PASS por la prueba de endpoints.
+
 ## Quinta prueba pública — duplicación y reversión (2026-09-30 ~06:05 ECT)
 
 En la versión `46a7b2c`, Jorge terminó una llamada de 01:46. La UI mostró **67/100 con 65 % de cobertura**, pero repitió literalmente la objeción «Un reembolso de envío es una burla, mis operarios perdieron horas de trabajo por su culpa.» dos veces y apareció `El agente no respondió; finaliza manualmente si continúa.`. La traza optativa en Edge incluye un reply vacío, luego `recovery reply.create sent`, varios replies y dos `transcript.agent` consecutivos; no se capturaron IDs/timing exactos. Por tanto, la puntuación real está confirmada, **la continuidad G1 no**.
