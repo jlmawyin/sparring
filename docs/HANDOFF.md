@@ -1,5 +1,11 @@
 # Relevo de Sparring
 
+## CONFIRMACIÓN HUMANA — Jorge: «Ya quedó bien, para grabar»
+
+- Jorge confirma que la conversación funciona con `2f622c0`. Congelar código y pasar a grabación. Este reporte confirma su experiencia de continuidad; no aporta una nueva nota, cobertura ni medición de latencia.
+- Próximo paso humano: Game Bar en Edge, audífonos, sistema + micrófono, prueba de audio de 20 s; toma completa de 2–3 min usando `submission-assets/demo-response-guide.md`. Esperar réplica tras cada intervención y coaching al terminar. `Win+Alt+R` inicia/detiene. MP4 esperado en `C:\Users\Jorge\Videos\Captures` (aún sin archivo encontrado en la comprobación de este turno).
+- Relevo externo: verificar el MP4 con `scripts/check-recording.ps1`, editar ~90 s auténticos y revisar audio/imagen, subir al borrador lablab que ya conserva cover/slides y completar repo/demo; solicitar revisión final concreta antes del envío. No reconstruir puntuación o conversación ficticia para el video. Codex sigue sin cupo normal; créditos existentes al abrir este turno 47,67, semanal 27 % usado. No comprar ni canjear resets. Continuar con Claude CLI según autorización de Jorge y preservar reserva.
+
 ## CODEX — 2026-09-30 ~07:23 ECT (continuidad comprobada con audio sintético real; prueba humana pendiente)
 
 - **RELEVO por cuota:** cierre del lote: ventana Codex 5 h 100 % usada, semanal 27 %, ordinaryUsageAllowed=false, créditos existentes 71,03 (el usuario autorizó su uso para esta entrega, sin compras/resets). Detener despacho nuevo de Codex y continuar con CLI externo según autorización vigente. Claude Sonnet funcionó en los tres encargos de este lote y no reportó alertas; cuota exacta DESCONOCIDA. Grok CLI 4.6 es la alternativa de orquestación del playbook; verificar autenticación/cupo antes de asumir disponibilidad. Próxima decisión depende del resultado humano, no de otra modificación automática.

@@ -1,5 +1,9 @@
 # Gate G1 — nota real verificada; continuidad pendiente
 
+## Confirmación humana posterior a `2f622c0`
+
+Jorge reportó: «Ya quedó bien, para grabar». Se acepta la continuidad para pasar a captura auténtica. No se infiere una nueva nota, porcentaje de cobertura, latencia ni prueba formal de interrupciones de este mensaje. Mantener código congelado y registrar la evidencia audiovisual de la toma.
+
 ## Corrección `2f622c0` — ensayo real con audio sintético (2026-09-30 ~07:23 ECT)
 
 Cuatro comparaciones de AssemblyAI con PCM ficticio a tiempo real respaldan quitar la obligación del prompt de evaluar antes de hablar: el prompt completo con tools terminó una intervención sin contenido; el prompt sólo de cliente respondió con y sin las mismas tools; quitar sólo las tools conservando el prompt completo produjo incluso sintaxis de scoring hablada. Son pocas muestras, no una prueba exhaustiva de causalidad. El envío se corrigió antes de comparar: desfase medido 2–13 ms sobre clips de 9240/14040 ms. La auditoría/implementación se delegó a Claude CLI y Codex revisó integración.
